@@ -185,7 +185,7 @@ class SDRDevice():
             text += "  %s: %s" % (gain, self.device.getGainRange(SoapySDR.SOAPY_SDR_RX, ch, gain))
 
         frequencies = self.device.listFrequencies(SoapySDR.SOAPY_SDR_RX, ch)
-        text += "Frequencies names:" +str(frequencies) + "\n"
+        text += " \n Frequencies names:" + str(frequencies) + "\n"
 
         frequency_name = frequencies[0]
         text += "Frequency channel name:" + str(frequency_name) + "\n"
