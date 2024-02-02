@@ -19,9 +19,10 @@ from gnuradio import blocks
 from gnuradio import filter
 from gnuradio import gr
 from gnuradio.fft import window
-import sys
 import signal
 from gnuradio import soapy
+
+
 
 from gnuradio import qtgui
 
@@ -69,21 +70,24 @@ class fmfm(gr.top_block, Qt.QWidget):
         ##################################################
         # Blocks
         ##################################################
-        self.soapy_sdrplay_source_0 = None
-        dev = 'driver=sdrplay'
+        self.soapy_custom_source_0 = None
+        dev = 'driver=' + 'sdrplay'
         stream_args = ''
         tune_args = ['']
         settings = ['']
-
-        self.soapy_sdrplay_source_0 = soapy.source(dev, "fc32", 1, '',
+        self.soapy_custom_source_0 = soapy.source(dev, "fc32",
+                                  1, '',
                                   stream_args, tune_args, settings)
-        self.soapy_sdrplay_source_0.set_sample_rate(0, samp_rate)
-        self.soapy_sdrplay_source_0.set_bandwidth(0, 0.0)
-        self.soapy_sdrplay_source_0.set_antenna(0, 'RX')
-        self.soapy_sdrplay_source_0.set_gain_mode(0, False)
-        self.soapy_sdrplay_source_0.set_frequency(0, base_freq)
-        self.soapy_sdrplay_source_0.set_frequency_correction(0, 0)
-        self.soapy_sdrplay_source_0.set_gain(0, min(max(--20, 0.0), 47.0))
+        self.soapy_custom_source_0.set_sample_rate(0, samp_rate)
+        self.soapy_custom_source_0.set_bandwidth(0, 0)
+        self.soapy_custom_source_0.set_antenna(0, 'RX')
+        self.soapy_custom_source_0.set_frequency(0, base_freq)
+        self.soapy_custom_source_0.set_frequency_correction(0, 0)
+        self.soapy_custom_source_0.set_gain_mode(0, False)
+        self.soapy_custom_source_0.set_gain(0, 10)
+        self.soapy_custom_source_0.set_dc_offset_mode(0, True)
+        self.soapy_custom_source_0.set_dc_offset(0, 0)
+        self.soapy_custom_source_0.set_iq_balance(0, 0)
         self.rational_resampler_xxx_0 = filter.rational_resampler_ccc(
                 interpolation=1,
                 decimation=25,
@@ -190,7 +194,7 @@ class fmfm(gr.top_block, Qt.QWidget):
         self.connect((self.blocks_throttle_0, 0), (self.qtgui_time_sink_x_0, 0))
         self.connect((self.rational_resampler_xxx_0, 0), (self.analog_fm_demod_cf_0, 0))
         self.connect((self.rational_resampler_xxx_0, 0), (self.qtgui_sink_x_0, 0))
-        self.connect((self.soapy_sdrplay_source_0, 0), (self.rational_resampler_xxx_0, 0))
+        self.connect((self.soapy_custom_source_0, 0), (self.rational_resampler_xxx_0, 0))
 
 
     def closeEvent(self, event):
@@ -214,7 +218,6 @@ class fmfm(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.soapy_sdrplay_source_0.set_sample_rate(0, self.samp_rate)
 
     def get_base_freq_0(self):
         return self.base_freq_0
@@ -228,15 +231,16 @@ class fmfm(gr.top_block, Qt.QWidget):
     def set_base_freq(self, base_freq):
         self.base_freq = base_freq
         self.qtgui_sink_x_0.set_frequency_range(self.base_freq, 1000000)
-        self.soapy_sdrplay_source_0.set_frequency(0, self.base_freq)
+        self.soapy_custom_source_0.set_frequency(0, self.base_freq)
 
 
-def main(top_block_cls=fmfm, options=None):
+
+
+def fmfm_start_dsp(top_block_cls=fmfm, options=None):
 
     if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
         style = gr.prefs().get_string('qtgui', 'style', 'raster')
         Qt.QApplication.setGraphicsSystem(style)
-    qapp = Qt.QApplication(sys.argv)
 
     tb = top_block_cls()
 
@@ -257,4 +261,3 @@ def main(top_block_cls=fmfm, options=None):
     timer.start(500)
     timer.timeout.connect(lambda: None)
 
-    qapp.exec_()

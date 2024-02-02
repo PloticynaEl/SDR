@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>350</width>
+    <height>390</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>321</width>
+     <height>371</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>20</number>
+    </property>
+    <item>
+     <widget class="QLabel" name="label">
+      <property name="maximumSize">
+       <size>
+        <width>300</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Выберите путь для сохранения:</string>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetMinimumSize</enum>
+      </property>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_path">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>220</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="layoutDirection">
+         <enum>Qt::LeftToRight</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="path_button">
+        <property name="maximumSize">
+         <size>
+          <width>90</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="sizeIncrement">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="icon">
+         <iconset>
+          <normaloff>black-folder.svg</normaloff>black-folder.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>30</width>
+          <height>30</height>
+         </size>
+        </property>
+        <property name="checkable">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QLabel" name="label_2">
+      <property name="maximumSize">
+       <size>
+        <width>300</width>
+        <height>50</height>
+       </size>
+      </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
+      <property name="tabletTracking">
+       <bool>false</bool>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="text">
+       <string>Далее будут сохранены следующие файлы:</string>
+      </property>
+      <property name="scaledContents">
+       <bool>false</bool>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QListView" name="listView_path"/>
+    </item>
+    <item>
+     <widget class="QPushButton" name="continue_button_5">
+      <property name="text">
+       <string>Выбрать</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="cancel_button_5">
+      <property name="text">
+       <string>Отмена</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
