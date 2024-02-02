@@ -120,14 +120,14 @@ p, li { white-space: pre-wrap; }
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton_choose">
+     <widget class="QPushButton" name="continue_button_2">
       <property name="text">
        <string>Выбрать</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton_cancel">
+     <widget class="QPushButton" name="cancel_button_2">
       <property name="text">
        <string>Отмена</string>
       </property>

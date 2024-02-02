@@ -65,7 +65,7 @@
       <height>209</height>
      </rect>
     </property>
-    <widget class="QListWidget" name="listWidget">
+    <widget class="QListWidget" name="listWidget_usb">
      <property name="geometry">
       <rect>
        <x>0</x>
@@ -88,21 +88,21 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="QPushButton" name="pushButton_update">
+     <widget class="QPushButton" name="update_button_3">
       <property name="text">
        <string>Обновить</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton_choose">
+     <widget class="QPushButton" name="continue_button_3">
       <property name="text">
        <string>Выбрать</string>
       </property>
      </widget>
     </item>
     <item>
-     <widget class="QPushButton" name="pushButton_cancel">
+     <widget class="QPushButton" name="cancel_button_3">
       <property name="text">
        <string>Отмена</string>
       </property>
