@@ -7,6 +7,8 @@ import re
 import subprocess
 import SoapySDR
 import fmfm_wav_iq
+import os
+import datetime
 
 
 from pathlib import Path
@@ -21,43 +23,36 @@ class Window1(QMainWindow):
 
     def button_continue_1(self):
         self.openWindow5()
-        pass
 
     def comboBox_activated(self, index):
         print("Activated index:", index)
         if index == 0:
             pass
         elif index == 1:
-            self.show_remoute()
+            self.openWindow2()
         elif index == 2:
-            self.show_usb()
+            self.openWindow3()
         elif index == 3:
-            self.show_usb_soapy()
+            self.openWindow4()
+
     def openWindow2(self):
+        # запускаем окно настройки удаленного подключения
         self.window2 = Window2() # REMOUTE
         self.window2.exec_()
 
-    def show_remoute(self):
-        # запускаем окно настройки удаленного подключения
-        self.openWindow2()
-
     def openWindow3(self):
+        # запускаем окно с выбором устройства usb
         self.window3 = Window3() #USB
         self.window3.exec_()
 
-    def show_usb(self):
-        # запускаем окно с выбором устройства usb
-        self.openWindow3()
-
-    def show_usb_soapy(self):
-        # запускаем окно с выбором устройства soapy
-        self.openWindow4()
-
     def openWindow4(self):
-        self.window4 = Window4() # Soapy(USB)
+        # запускаем окно с выбором устройства soapy
+        self.window4 = Window4()
         self.window4.exec_()
+
     def openWindow5(self):
-        self.window5 = Window5() # modulation
+        # запускаем окно с вариантами демодуляции
+        self.window5 = Window5() # demodulation
         self.window5.exec_()
 
     def openWindow6(self):
@@ -79,9 +74,9 @@ class Window2(QDialog): #REMOUTE
                                      "Вы хотите отменить действие?",
                                      QMessageBox.Yes | QMessageBox.No)
         if reply == QMessageBox.Yes:
-            event.accept() # Если пользователь подтверждает, то окно закрывается
+            event.accept()
         else:
-            event.ignore() # Если нет, то событие игнорируется
+            event.ignore()
 
 class Window3(QDialog): #USB
     def __init__(self):
@@ -161,13 +156,14 @@ class Window4(QDialog): #SoapySDR(USB)
 class SDRDevice():
     def __init__(self):
         self.soapy_device = "sdrplay"
+        self.sample_rates = []
         self.device = SoapySDR.Device(dict(driver=self.soapy_device))
 
     def print_info(self):
         channels = list(range(self.device.getNumChannels(SoapySDR.SOAPY_SDR_RX)))
         ch = channels[0]
-        sample_rates = self.device.listSampleRates(SoapySDR.SOAPY_SDR_RX, ch)
-        for i in sample_rates:
+        self.sample_rates = self.device.listSampleRates(SoapySDR.SOAPY_SDR_RX, ch)
+        for i in self.sample_rates:
             window1.comboBox_first_samp_freq.addItem(str(i))
         window1.comboBox_first_samp_freq.setCurrentIndex(0)
 
@@ -180,8 +176,8 @@ class SDRDevice():
         channels = list(range(self.device.getNumChannels(SoapySDR.SOAPY_SDR_RX)))
         text = "Channels:" + str(channels) + "\n"
         ch = channels[0]
-        sample_rates = self.device.listSampleRates(SoapySDR.SOAPY_SDR_RX, ch)
-        text += "Sample rates:\n" + str(sample_rates) + "\n"
+        self.sample_rates = self.device.listSampleRates(SoapySDR.SOAPY_SDR_RX, ch)
+        text += "Sample rates:\n" + str(self.sample_rates) + "\n"
 
         bandwidths = list(map(lambda r: int(r.maximum()), self.device.getBandwidthRange(SoapySDR.SOAPY_SDR_RX, ch)))
         text += "Bandwidths:\n" + str(bandwidths) + "\n"
@@ -199,20 +195,29 @@ class SDRDevice():
         text += "Frequency range:" +str( self.device.getFrequencyRange(SoapySDR.SOAPY_SDR_RX, ch, frequency_name)[0])
         return text
 
-class Window5(QDialog): # modulation
+class Window5(QDialog): # demodulation
     def __init__(self):
         super().__init__()
-        uic.loadUi('window_modulation.ui',self)
+        uic.loadUi('window_demodulation.ui',self)
         # self.pushButton_cancel.clicked.connect(lambda: self.close())
         self.device = SDRDevice()
         self.text2 = self.device.get_text()
         self.textEdit.setText(str(self.text2))
         self.cancel_button_4.clicked.connect(lambda: self.close())
         self.continue_button_4.clicked.connect(self.start_DSP)
+        for i in self.device.sample_rates:
+            self.comboBox_sampl.addItem(str(i))
+        self.comboBox_sampl.setCurrentIndex(0)
         self.checkBox.stateChanged.connect(self.onStateChanged)
 
     def start_DSP(self):
-        print(fmfm_wav_iq.SAVE)
+        fmfm_wav_iq.BASE_FREQ = self.doubleSpinBox_freq.value() * 1000000
+        sampl_currentText = self.comboBox_sampl.currentText()
+        dot_index = sampl_currentText.find('.')
+        if dot_index > -1:
+            sampl_currentText = sampl_currentText[:dot_index]
+        fmfm_wav_iq.SAMP_RATE = int(sampl_currentText)
+        self.close()
         fmfm_wav_iq.fmfm_start_dsp()
 
     def onStateChanged(self):
@@ -220,11 +225,9 @@ class Window5(QDialog): # modulation
             # Запись файлов
             Window1.openWindow6(window1)
             fmfm_wav_iq.SAVE=True
-            print(fmfm_wav_iq.SAVE)
         else:
             # Без записи файлов
             fmfm_wav_iq.SAVE = False
-            print(fmfm_wav_iq.SAVE)
 
 
     def closeEvent(self, event):
@@ -251,8 +254,9 @@ class Window6(QDialog): # select path
             fmfm_wav_iq.DIRECTORY_PATH = str(path)
             print(path)
             print(str(path))
-
             self.lineEdit_path.setText(str(path))
+            self.textEdit_path.setText(str(os.path.join(path,"SDR_%s_%dkHz_RF.wav"
+                                                        % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"), 2 / 1000)))+"\n"+str(os.path.join(path,"SDR_%s_%dkHz_RF.iq" % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"), 2 / 1000))))
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Внимание',

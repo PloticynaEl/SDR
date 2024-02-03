@@ -10,9 +10,9 @@
 # GNU Radio version: 3.10.1.1
 
 from packaging.version import Version as StrictVersion
-import os
 from PyQt5 import Qt
 import sip
+import os
 import datetime
 from gnuradio import analog
 from gnuradio import audio
@@ -31,6 +31,10 @@ SAVE = False
 FILENAME = ''
 DIRECTORY_PATH = ''
 DRIVER_ID = 'sdrplay'
+
+SAMP_RATE_2 = 48000
+SAMP_RATE = 0
+BASE_FREQ = 0
 
 class fmfm(gr.top_block, Qt.QWidget):
 
@@ -68,10 +72,10 @@ class fmfm(gr.top_block, Qt.QWidget):
         ##################################################
         # Variables
         ##################################################
-        self.samp_rate_2 = samp_rate_2 = 48000
-        self.samp_rate = samp_rate = 6000000
-        self.base_freq_0 = base_freq_0 = 6000000
-        self.base_freq = base_freq = 101500000
+        self.samp_rate_2 = samp_rate_2 = SAMP_RATE_2
+        self.samp_rate = samp_rate = SAMP_RATE
+        self.base_freq = base_freq = BASE_FREQ
+
 
         ##################################################
         # Blocks
@@ -109,7 +113,7 @@ class fmfm(gr.top_block, Qt.QWidget):
         self.qtgui_time_sink_x_0.set_update_time(0.10)
         self.qtgui_time_sink_x_0.set_y_axis(-1, 1)
 
-        self.qtgui_time_sink_x_0.set_y_label('Amplitude', "")
+        self.qtgui_time_sink_x_0.set_y_label('Амплитуда', "")
 
         self.qtgui_time_sink_x_0.enable_tags(True)
         self.qtgui_time_sink_x_0.set_trigger_mode(qtgui.TRIG_MODE_FREE, qtgui.TRIG_SLOPE_POS, 0.0, 0, 0, "")
@@ -119,7 +123,7 @@ class fmfm(gr.top_block, Qt.QWidget):
         self.qtgui_time_sink_x_0.enable_control_panel(False)
         self.qtgui_time_sink_x_0.enable_stem_plot(False)
 
-        label = 'Signal 1'
+        label = 'Сигнал 1'
         width = 1
         color = 'red'
         alpha = 1.0
@@ -214,7 +218,7 @@ class fmfm(gr.top_block, Qt.QWidget):
             self.connect((self.soapy_custom_source_0, 0), (self.rational_resampler_xxx_0, 0))
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "fmfm")
+        self.settings = Qt.QSettings("GNU Radio", "FM демодуляция")
         self.settings.setValue("geometry", self.saveGeometry())
         self.stop()
         self.wait()
@@ -234,12 +238,6 @@ class fmfm(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-
-    def get_base_freq_0(self):
-        return self.base_freq_0
-
-    def set_base_freq_0(self, base_freq_0):
-        self.base_freq_0 = base_freq_0
 
     def get_base_freq(self):
         return self.base_freq

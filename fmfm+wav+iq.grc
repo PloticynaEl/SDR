@@ -45,18 +45,6 @@ blocks:
     coordinate: [288, 12.0]
     rotation: 0
     state: enabled
-- name: base_freq_0
-  id: variable
-  parameters:
-    comment: ''
-    value: '6000000'
-  states:
-    bus_sink: false
-    bus_source: false
-    bus_structure: null
-    coordinate: [184, 84.0]
-    rotation: 0
-    state: enabled
 - name: samp_rate
   id: variable
   parameters:

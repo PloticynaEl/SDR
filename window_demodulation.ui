@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>Form</class>
- <widget class="QWidget" name="Form">
+ <widget class="QWidget" name="SDR">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -164,6 +164,9 @@
            </property>
            <property name="accelerated">
             <bool>true</bool>
+           </property>
+           <property name="maximum">
+            <double>999.990000000000009</double>
            </property>
           </widget>
          </item>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>SDR</class>
+ <widget class="QMainWindow" name="SDR">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -148,7 +148,7 @@
       <rect>
        <x>27</x>
        <y>100</y>
-       <width>261</width>
+       <width>273</width>
        <height>281</height>
       </rect>
      </property>
@@ -310,6 +310,37 @@
       </item>
       <item>
        <widget class="QComboBox" name="comboBox_output_samp_freq">
+        <property name="currentText">
+         <string>16 кГц</string>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>16 кГц</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>22.05 кГц</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>24 кГц</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>32 кГц</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>44.1 кГц</string>
+         </property>
+        </item>
         <item>
          <property name="text">
           <string>48 кГц</string>
@@ -329,13 +360,6 @@
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <item>
-       <widget class="QPushButton" name="update_button_1">
-        <property name="text">
-         <string>Обновить</string>
-        </property>
-       </widget>
-      </item>
       <item>
        <widget class="QPushButton" name="continue_button_1">
         <property name="text">
