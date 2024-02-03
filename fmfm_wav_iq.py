@@ -6,7 +6,7 @@
 #
 # GNU Radio Python Flow Graph
 # Title: Not titled yet
-# Author: elonora
+# Author: eleonora
 # GNU Radio version: 3.10.1.1
 
 from packaging.version import Version as StrictVersion
@@ -30,6 +30,8 @@ from gnuradio import qtgui
 SAVE = False
 FILENAME = ''
 DIRECTORY_PATH = ''
+DRIVER_ID = 'sdrplay'
+
 class fmfm(gr.top_block, Qt.QWidget):
 
     def __init__(self):
@@ -75,7 +77,7 @@ class fmfm(gr.top_block, Qt.QWidget):
         # Blocks
         ##################################################
         self.soapy_custom_source_0 = None
-        dev = 'driver=' + 'sdrplay'
+        dev = 'driver=' + DRIVER_ID
         stream_args = ''
         tune_args = ['']
         settings = ['']
@@ -117,37 +119,25 @@ class fmfm(gr.top_block, Qt.QWidget):
         self.qtgui_time_sink_x_0.enable_control_panel(False)
         self.qtgui_time_sink_x_0.enable_stem_plot(False)
 
+        label = 'Signal 1'
+        width = 1
+        color = 'red'
+        alpha = 1.0
+        style = 1
+        marker = -1
 
-        labels = ['Signal 1', 'Signal 2', 'Signal 3', 'Signal 4', 'Signal 5',
-            'Signal 6', 'Signal 7', 'Signal 8', 'Signal 9', 'Signal 10']
-        widths = [1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1]
-        colors = ['blue', 'red', 'green', 'black', 'cyan',
-            'magenta', 'yellow', 'dark red', 'dark green', 'dark blue']
-        alphas = [1.0, 1.0, 1.0, 1.0, 1.0,
-            1.0, 1.0, 1.0, 1.0, 1.0]
-        styles = [1, 1, 1, 1, 1,
-            1, 1, 1, 1, 1]
-        markers = [-1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1]
-
-
-        for i in range(1):
-            if len(labels[i]) == 0:
-                self.qtgui_time_sink_x_0.set_line_label(i, "Data {0}".format(i))
-            else:
-                self.qtgui_time_sink_x_0.set_line_label(i, labels[i])
-            self.qtgui_time_sink_x_0.set_line_width(i, widths[i])
-            self.qtgui_time_sink_x_0.set_line_color(i, colors[i])
-            self.qtgui_time_sink_x_0.set_line_style(i, styles[i])
-            self.qtgui_time_sink_x_0.set_line_marker(i, markers[i])
-            self.qtgui_time_sink_x_0.set_line_alpha(i, alphas[i])
+        self.qtgui_time_sink_x_0.set_line_label(0, label)
+        self.qtgui_time_sink_x_0.set_line_width(0, width)
+        self.qtgui_time_sink_x_0.set_line_color(0, color)
+        self.qtgui_time_sink_x_0.set_line_style(0, style)
+        self.qtgui_time_sink_x_0.set_line_marker(0, marker)
+        self.qtgui_time_sink_x_0.set_line_alpha(0, alpha)
 
         self._qtgui_time_sink_x_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0.qwidget(), Qt.QWidget)
         self.top_layout.addWidget(self._qtgui_time_sink_x_0_win)
         self.qtgui_sink_x_0 = qtgui.sink_c(
-            16384, #fftsize
-            window.WIN_BLACKMAN_hARRIS, #wintype
+            16384, # fftsize
+            window.WIN_BLACKMAN_hARRIS, # wintype
             base_freq, #fc
             1000000, #bw
             "", #name
