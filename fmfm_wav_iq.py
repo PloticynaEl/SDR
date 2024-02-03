@@ -10,44 +10,32 @@
 # GNU Radio version: 3.10.1.1
 
 from packaging.version import Version as StrictVersion
-
-if __name__ == '__main__':
-    import ctypes
-    import sys
-    if sys.platform.startswith('linux'):
-        try:
-            x11 = ctypes.cdll.LoadLibrary('libX11.so')
-            x11.XInitThreads()
-        except:
-            print("Warning: failed to XInitThreads()")
-
+import os
 from PyQt5 import Qt
-from gnuradio import qtgui
-from gnuradio.filter import firdes
 import sip
+import datetime
 from gnuradio import analog
 from gnuradio import audio
 from gnuradio import blocks
 from gnuradio import filter
 from gnuradio import gr
 from gnuradio.fft import window
-import sys
 import signal
-from argparse import ArgumentParser
-from gnuradio.eng_arg import eng_float, intx
-from gnuradio import eng_notation
 from gnuradio import soapy
 
 
 
 from gnuradio import qtgui
 
+SAVE = False
+FILENAME = ''
+DIRECTORY_PATH = ''
 class fmfm(gr.top_block, Qt.QWidget):
 
     def __init__(self):
-        gr.top_block.__init__(self, "Not titled yet", catch_exceptions=True)
+        gr.top_block.__init__(self, "FM DSP", catch_exceptions=True)
         Qt.QWidget.__init__(self)
-        self.setWindowTitle("Not titled yet")
+        self.setWindowTitle("SDR")
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
@@ -175,18 +163,32 @@ class fmfm(gr.top_block, Qt.QWidget):
         self.qtgui_sink_x_0.enable_rf_freq(False)
 
         self.top_layout.addWidget(self._qtgui_sink_x_0_win)
-        self.blocks_wavfile_sink_0 = blocks.wavfile_sink(
-            '/media/elonora/file/1.wav',
-            1,
-            samp_rate_2,
-            blocks.FORMAT_WAV,
-            blocks.FORMAT_PCM_16,
-            False
-            )
+
+        if (SAVE):
+            # Формируем полный путь к файлу с использованием os.path.join
+            file_name_wav = os.path.join(DIRECTORY_PATH,"SDR_%s_%dkHz_RF.wav" % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"), base_freq / 1000))
+            # Инициализация блока сохранения потока данных в .wav
+            self.blocks_wavfile_sink_0 = blocks.wavfile_sink(
+                file_name_wav,
+                1,
+                samp_rate_2,
+                blocks.FORMAT_WAV,
+                blocks.FORMAT_PCM_16,
+                False
+                )
+
+
         self.blocks_throttle_0 = blocks.throttle(gr.sizeof_float*1, samp_rate_2,True)
         self.blocks_multiply_const_vxx_0 = blocks.multiply_const_ff(0.300)
-        self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_float*1, '/media/elonora/file/1.iq', False)
-        self.blocks_file_sink_0.set_unbuffered(False)
+
+        if (SAVE):
+            # Формируем полный путь к файлу с использованием os.path.join
+            file_name_iq = os.path.join(DIRECTORY_PATH,"SDR_%s_%dkHz_RF.iq" % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"), base_freq / 1000))
+            # Инициализация блока сохранения потока данных в .iq
+            self.blocks_file_sink_0 = blocks.file_sink(gr.sizeof_float*1, file_name_iq, False)
+            self.blocks_file_sink_0.set_unbuffered(False)
+
+
         self.audio_sink_0 = audio.sink(48000, '', True)
         self.analog_fm_demod_cf_0 = analog.fm_demod_cf(
         	channel_rate=240000,
@@ -202,16 +204,24 @@ class fmfm(gr.top_block, Qt.QWidget):
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.analog_fm_demod_cf_0, 0), (self.blocks_multiply_const_vxx_0, 0))
-        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_file_sink_0, 0))
-        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_throttle_0, 0))
-        self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_wavfile_sink_0, 0))
-        self.connect((self.blocks_throttle_0, 0), (self.audio_sink_0, 0))
-        self.connect((self.blocks_throttle_0, 0), (self.qtgui_time_sink_x_0, 0))
-        self.connect((self.rational_resampler_xxx_0, 0), (self.analog_fm_demod_cf_0, 0))
-        self.connect((self.rational_resampler_xxx_0, 0), (self.qtgui_sink_x_0, 0))
-        self.connect((self.soapy_custom_source_0, 0), (self.rational_resampler_xxx_0, 0))
-
+        if (SAVE):
+            self.connect((self.analog_fm_demod_cf_0, 0), (self.blocks_multiply_const_vxx_0, 0))
+            self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_file_sink_0, 0))
+            self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_throttle_0, 0))
+            self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_wavfile_sink_0, 0))
+            self.connect((self.blocks_throttle_0, 0), (self.audio_sink_0, 0))
+            self.connect((self.blocks_throttle_0, 0), (self.qtgui_time_sink_x_0, 0))
+            self.connect((self.rational_resampler_xxx_0, 0), (self.analog_fm_demod_cf_0, 0))
+            self.connect((self.rational_resampler_xxx_0, 0), (self.qtgui_sink_x_0, 0))
+            self.connect((self.soapy_custom_source_0, 0), (self.rational_resampler_xxx_0, 0))
+        else:
+            self.connect((self.analog_fm_demod_cf_0, 0), (self.blocks_multiply_const_vxx_0, 0))
+            self.connect((self.blocks_multiply_const_vxx_0, 0), (self.blocks_throttle_0, 0))
+            self.connect((self.blocks_throttle_0, 0), (self.audio_sink_0, 0))
+            self.connect((self.blocks_throttle_0, 0), (self.qtgui_time_sink_x_0, 0))
+            self.connect((self.rational_resampler_xxx_0, 0), (self.analog_fm_demod_cf_0, 0))
+            self.connect((self.rational_resampler_xxx_0, 0), (self.qtgui_sink_x_0, 0))
+            self.connect((self.soapy_custom_source_0, 0), (self.rational_resampler_xxx_0, 0))
 
     def closeEvent(self, event):
         self.settings = Qt.QSettings("GNU Radio", "fmfm")
@@ -252,12 +262,11 @@ class fmfm(gr.top_block, Qt.QWidget):
 
 
 
-def main(top_block_cls=fmfm, options=None):
+def fmfm_start_dsp(top_block_cls=fmfm, options=None):
 
     if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
         style = gr.prefs().get_string('qtgui', 'style', 'raster')
         Qt.QApplication.setGraphicsSystem(style)
-    qapp = Qt.QApplication(sys.argv)
 
     tb = top_block_cls()
 
@@ -278,7 +287,3 @@ def main(top_block_cls=fmfm, options=None):
     timer.start(500)
     timer.timeout.connect(lambda: None)
 
-    qapp.exec_()
-
-if __name__ == '__main__':
-    main()

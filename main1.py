@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox, QFi
 import re
 import subprocess
 import SoapySDR
-import fmfm
+import fmfm_wav_iq
 
 
 from pathlib import Path
@@ -34,11 +34,11 @@ class Window1(QMainWindow):
         elif index == 3:
             self.show_usb_soapy()
     def openWindow2(self):
-        self.window2 = Window2() #REMOUTE
+        self.window2 = Window2() # REMOUTE
         self.window2.exec_()
 
     def show_remoute(self):
-        print("запускаем окно настройки удаленного подключения")
+        # запускаем окно настройки удаленного подключения
         self.openWindow2()
 
     def openWindow3(self):
@@ -46,22 +46,22 @@ class Window1(QMainWindow):
         self.window3.exec_()
 
     def show_usb(self):
-        print("запускаем окно с выбором устройства usb")
+        # запускаем окно с выбором устройства usb
         self.openWindow3()
 
     def show_usb_soapy(self):
-        print("запускаем окно с выбором устройства soapy")
+        # запускаем окно с выбором устройства soapy
         self.openWindow4()
 
     def openWindow4(self):
-        self.window4 = Window4() #Soapy(USB)
+        self.window4 = Window4() # Soapy(USB)
         self.window4.exec_()
     def openWindow5(self):
-        self.window5 = Window5() #modulation
+        self.window5 = Window5() # modulation
         self.window5.exec_()
 
     def openWindow6(self):
-        self.window6 = Window6() #modulation
+        self.window6 = Window6() # path
         self.window6.exec_()
 
 class Window2(QDialog): #REMOUTE
@@ -199,11 +199,11 @@ class SDRDevice():
         text += "Frequency range:" +str( self.device.getFrequencyRange(SoapySDR.SOAPY_SDR_RX, ch, frequency_name)[0])
         return text
 
-class Window5(QDialog): #modulation
+class Window5(QDialog): # modulation
     def __init__(self):
         super().__init__()
         uic.loadUi('window_modulation.ui',self)
-        #self.pushButton_cancel.clicked.connect(lambda: self.close())
+        # self.pushButton_cancel.clicked.connect(lambda: self.close())
         self.device = SDRDevice()
         self.text2 = self.device.get_text()
         self.textEdit.setText(str(self.text2))
@@ -211,20 +211,20 @@ class Window5(QDialog): #modulation
         self.continue_button_4.clicked.connect(self.start_DSP)
         self.checkBox.stateChanged.connect(self.onStateChanged)
 
-
     def start_DSP(self):
-        self.close()
-        fmfm.fmfm_start_dsp()
+        print(fmfm_wav_iq.SAVE)
+        fmfm_wav_iq.fmfm_start_dsp()
 
     def onStateChanged(self):
         if self.checkBox.isChecked():
             # Запись файлов
             Window1.openWindow6(window1)
-        #else:
+            fmfm_wav_iq.SAVE=True
+            print(fmfm_wav_iq.SAVE)
+        else:
             # Без записи файлов
-
-
-
+            fmfm_wav_iq.SAVE = False
+            print(fmfm_wav_iq.SAVE)
 
 
     def closeEvent(self, event):
@@ -241,13 +241,17 @@ class Window6(QDialog): # select path
         super().__init__()
         uic.loadUi('window_path.ui',self)
         self.cancel_button_5.clicked.connect(lambda: self.close())
-
+        self.continue_button_5.clicked.connect(lambda: self.close())
         self.path_button.clicked.connect(self.open_dir_dialog)
 
     def open_dir_dialog(self):
         dir_name = QFileDialog.getExistingDirectory(self, "Select a Directory")
         if dir_name:
             path = Path(dir_name)
+            fmfm_wav_iq.DIRECTORY_PATH = str(path)
+            print(path)
+            print(str(path))
+
             self.lineEdit_path.setText(str(path))
 
     def closeEvent(self, event):
