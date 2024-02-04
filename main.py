@@ -25,7 +25,6 @@ class Window1(QMainWindow):
         self.openWindow5()
 
     def comboBox_activated(self, index):
-        print("Activated index:", index)
         if index == 0:
             pass
         elif index == 1:
@@ -63,15 +62,19 @@ class Window2(QDialog): #REMOUTE
     def __init__(self):
         super().__init__()
         uic.loadUi('window_remoute.ui',self)
-        self.continue_button_2.clicked.connect(self.pushButton_choose_func)
+        self.continue_button_2.clicked.connect(self.pushButton_continue_button_2)
         self.cancel_button_2.clicked.connect(lambda: self.close())
 
-    def pushButton_choose_func(self):
-        print(self.comboBox_choose.currentText())
-        print(self.textEdit_port.toPlainText())
+    def pushButton_continue_button_2(self):
+        fmfm_wav_iq.REMOUTE = True
+        port = self.textEdit_port.toPlainText()
+        fmfm_wav_iq.DRIVER_ID = 'soapy=0,driver=remote,remote=tcp://%s' % port
+        self.close()
+
+
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Внимание',
-                                     "Вы хотите отменить действие?",
+                                     "Продолжить?",
                                      QMessageBox.Yes | QMessageBox.No)
         if reply == QMessageBox.Yes:
             event.accept()
@@ -100,7 +103,6 @@ class Window3(QDialog): #USB
                     dinfo = info.groupdict()
                     dinfo['device'] = '/dev/bus/usb/%s/%s' % (dinfo.pop('bus'), dinfo.pop('device'))
                     devices.append(dinfo)
-        print(devices)
         for i in devices:
             self.listWidget_usb.addItem(i['tag'])
 
@@ -140,7 +142,7 @@ class Window4(QDialog): #SoapySDR(USB)
         window1.comboBox_devices.addItem(self.listWidget_usb.selectedIndexes()[0].data())
         window1.comboBox_devices.setCurrentIndex(window1.comboBox_devices.count() - 1)
         self.close()
-        self.device = SDRDevice()
+        self.device = SDRDevice("sdrplay")
         self.device.print_info()
 
 
@@ -154,9 +156,10 @@ class Window4(QDialog): #SoapySDR(USB)
             event.ignore() # Если нет, то событие игнорируется
 
 class SDRDevice():
-    def __init__(self):
-        self.soapy_device = "sdrplay"
+    def __init__(self,soapy_device):
+        self.soapy_device = soapy_device
         self.sample_rates = []
+        fmfm_wav_iq.DRIVER_ID[0] = soapy_device
         self.device = SoapySDR.Device(dict(driver=self.soapy_device))
 
     def print_info(self):
@@ -200,14 +203,15 @@ class Window5(QDialog): # demodulation
         super().__init__()
         uic.loadUi('window_demodulation.ui',self)
         # self.pushButton_cancel.clicked.connect(lambda: self.close())
-        self.device = SDRDevice()
-        self.text2 = self.device.get_text()
-        self.textEdit.setText(str(self.text2))
+        if (fmfm_wav_iq.REMOUTE == False):
+            self.device = SDRDevice('sdrplay')
+            self.text2 = self.device.get_text()
+            self.textEdit.setText(str(self.text2))
+            for i in self.device.sample_rates:
+                self.comboBox_sampl.addItem(str(i))
+            self.comboBox_sampl.setCurrentIndex(0)
         self.cancel_button_4.clicked.connect(lambda: self.close())
         self.continue_button_4.clicked.connect(self.start_DSP)
-        for i in self.device.sample_rates:
-            self.comboBox_sampl.addItem(str(i))
-        self.comboBox_sampl.setCurrentIndex(0)
         self.checkBox.stateChanged.connect(self.onStateChanged)
 
     def start_DSP(self):
@@ -252,8 +256,6 @@ class Window6(QDialog): # select path
         if dir_name:
             path = Path(dir_name)
             fmfm_wav_iq.DIRECTORY_PATH = str(path)
-            print(path)
-            print(str(path))
             self.lineEdit_path.setText(str(path))
             self.textEdit_path.setText(str(os.path.join(path,"SDR_%s_%dkHz_RF.wav"
                                                         % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"), 2 / 1000)))+"\n"+str(os.path.join(path,"SDR_%s_%dkHz_RF.iq" % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"), 2 / 1000))))
@@ -269,7 +271,6 @@ class Window6(QDialog): # select path
 
 
 if __name__ == '__main__':
-    print('SDR')
     app = QApplication(sys.argv)
     window1 = Window1()
     window1.show()

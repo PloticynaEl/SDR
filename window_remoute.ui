@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Form</class>
+ <class>Remoute</class>
  <widget class="QWidget" name="FindSoapyRemoute">
   <property name="geometry">
    <rect>
@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Remoute</string>
   </property>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">

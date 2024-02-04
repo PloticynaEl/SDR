@@ -26,11 +26,11 @@ from gnuradio import soapy
 
 
 from gnuradio import qtgui
-
+REMOUTE = False
 SAVE = False
 FILENAME = ''
 DIRECTORY_PATH = ''
-DRIVER_ID = 'sdrplay'
+DRIVER_ID = ['', '']
 
 SAMP_RATE_2 = 48000
 SAMP_RATE = 0
@@ -81,7 +81,10 @@ class fmfm(gr.top_block, Qt.QWidget):
         # Blocks
         ##################################################
         self.soapy_custom_source_0 = None
-        dev = 'driver=' + DRIVER_ID
+        if REMOUTE:
+            dev = DRIVER_ID[1]
+        else:
+            dev = 'driver=' + DRIVER_ID[0]
         stream_args = ''
         tune_args = ['']
         settings = ['']
