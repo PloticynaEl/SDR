@@ -22,7 +22,10 @@ class Window1(QMainWindow):
         self.comboBox_devices.activated.connect(self.comboBox_activated)
 
     def button_continue_1(self):
-        self.openWindow5()
+        print("Переход на 5 окно")
+        DEVICE = get
+        if DEVICE != None:
+            self.openWindow5()
 
     def comboBox_activated(self, index):
         if index == 0:
@@ -142,6 +145,7 @@ class Window4(QDialog): #SoapySDR(USB)
         window1.comboBox_devices.addItem(self.listWidget_usb.selectedIndexes()[0].data())
         window1.comboBox_devices.setCurrentIndex(window1.comboBox_devices.count() - 1)
         self.close()
+
         self.device = SDRDevice("sdrplay")
         self.device.print_info()
 
@@ -205,6 +209,7 @@ class Window5(QDialog): # demodulation
         # self.pushButton_cancel.clicked.connect(lambda: self.close())
         if (fmfm_wav_iq.REMOUTE == False):
             self.device = SDRDevice('sdrplay')
+            #self.device = SDRDevice(DEVICE)
             self.text2 = self.device.get_text()
             self.textEdit.setText(str(self.text2))
             for i in self.device.sample_rates:
