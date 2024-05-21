@@ -13,6 +13,29 @@ import datetime
 
 from pathlib import Path
 
+class Window0(QDialog):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi('window_server_client.ui',self)
+        self.pushButton_server.clicked.connect(self.button_server)
+        self.pushButton_client.clicked.connect(self.button_client)
+
+    def button_server(self):
+        self.close()
+        #self.openWindow1()
+
+    def button_client(self):
+        self.close()
+        self.openWindow1()
+
+    def openWindow1(self):
+        global window1
+        self.window1 = Window1()
+        self.window1.show()
+
+   # def button_client(self):
+        #self.openWindow1()
+
 
 class Window1(QMainWindow):
     def __init__(self):
@@ -23,7 +46,7 @@ class Window1(QMainWindow):
 
     def button_continue_1(self):
         print("Переход на 5 окно")
-        DEVICE = get
+        DEVICE = None
         if DEVICE != None:
             self.openWindow5()
 
@@ -277,6 +300,6 @@ class Window6(QDialog): # select path
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window1 = Window1()
-    window1.show()
+    window0 = Window0()
+    window0.show()
     sys.exit(app.exec_())
