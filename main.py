@@ -1,16 +1,12 @@
 import sys
-import time
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox, QFileDialog
-#USB
 import re
 import subprocess
 import SoapySDR
 import fmfm_wav_iq
 import os
 import datetime
-
-
 from pathlib import Path
 
 class Window0(QDialog):
@@ -22,7 +18,7 @@ class Window0(QDialog):
 
     def button_server(self):
         self.close()
-        #self.openWindow1()
+        self.openWindow_server()
 
     def button_client(self):
         self.close()
@@ -33,8 +29,10 @@ class Window0(QDialog):
         self.window1 = Window1()
         self.window1.show()
 
-   # def button_client(self):
-        #self.openWindow1()
+    def openWindow_server(self):
+        global window_server
+        self.window_server = Window_server()
+        self.window_server.show()
 
 
 class Window1(QMainWindow):
@@ -45,7 +43,6 @@ class Window1(QMainWindow):
         self.comboBox_devices.activated.connect(self.comboBox_activated)
 
     def button_continue_1(self):
-        print("Переход на 5 окно")
         DEVICE = None
         if DEVICE != None:
             self.openWindow5()
@@ -83,6 +80,15 @@ class Window1(QMainWindow):
     def openWindow6(self):
         self.window6 = Window6() # path
         self.window6.exec_()
+
+class Window_server(QDialog):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi('window_server.ui',self)
+        self.pushButton_run.clicked.connect(self.button_run)
+
+    def button_run(self):
+        print("server run")
 
 class Window2(QDialog): #REMOUTE
     def __init__(self):
@@ -286,7 +292,11 @@ class Window6(QDialog): # select path
             fmfm_wav_iq.DIRECTORY_PATH = str(path)
             self.lineEdit_path.setText(str(path))
             self.textEdit_path.setText(str(os.path.join(path,"SDR_%s_%dkHz_RF.wav"
-                                                        % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"), 2 / 1000)))+"\n"+str(os.path.join(path,"SDR_%s_%dkHz_RF.iq" % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"), 2 / 1000))))
+                                                        % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"),
+                                                        2 / 1000)))+"\n"+
+                                       str(os.path.join(path,"SDR_%s_%dkHz_RF.iq"
+                                       % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"),
+                                       2 / 1000))))
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Внимание',

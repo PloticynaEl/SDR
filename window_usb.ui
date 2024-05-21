@@ -29,7 +29,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Выбор SDR-устройства</string>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
