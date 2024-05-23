@@ -54,7 +54,7 @@ QPushButton#cancel_button_remoute{
 	margin-bottom: 10px;
 }
 
-QPushButton#update_button_remoute{
+QPushButton#continue_button_remoute{
   	margin-top: 0px;
 	margin-bottom: 10px;
 }
@@ -566,7 +566,7 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="update_button_remoute">
+         <widget class="QPushButton" name="continue_button_remoute">
           <property name="minimumSize">
            <size>
             <width>350</width>

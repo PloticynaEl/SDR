@@ -42,7 +42,7 @@ QPushButton#cancel_button_remoute{
 	margin-bottom: 10px;
 }
 
-QPushButton#update_button_remoute{
+QPushButton#run_button_remoute{
   	margin-top: 0px;
 	margin-bottom: 10px;
 }
@@ -487,7 +487,7 @@ p, li { white-space: pre-wrap; }
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item alignment="Qt::AlignTop">
-          <widget class="QPushButton" name="update_button_remoute">
+          <widget class="QPushButton" name="cancel_button_remoute">
            <property name="minimumSize">
             <size>
              <width>350</width>
@@ -507,12 +507,12 @@ p, li { white-space: pre-wrap; }
             </font>
            </property>
            <property name="text">
-            <string> Выбрать</string>
+            <string>Отмена</string>
            </property>
           </widget>
          </item>
          <item alignment="Qt::AlignTop">
-          <widget class="QPushButton" name="cancel_button_remoute">
+          <widget class="QPushButton" name="run_button_remoute">
            <property name="minimumSize">
             <size>
              <width>350</width>
@@ -538,7 +538,7 @@ p, li { white-space: pre-wrap; }
             </font>
            </property>
            <property name="text">
-            <string>Отмена</string>
+            <string>Запустить</string>
            </property>
           </widget>
          </item>
