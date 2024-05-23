@@ -254,14 +254,15 @@ class fmfm(gr.top_block, Qt.QWidget):
 
 
 def fmfm_start_dsp(top_block_cls=fmfm, options=None):
-
+    print("check")
     if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
         style = gr.prefs().get_string('qtgui', 'style', 'raster')
         Qt.QApplication.setGraphicsSystem(style)
-
+    print("top_block_cls")
     tb = top_block_cls()
-
+    print("start")
     tb.start()
+    print("show")
 
     tb.show()
 

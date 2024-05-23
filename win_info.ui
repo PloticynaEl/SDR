@@ -129,7 +129,7 @@ background : green;
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QPushButton" name="cancel_button_2">
+        <widget class="QPushButton" name="cancel_button_info">
          <property name="minimumSize">
           <size>
            <width>350</width>
@@ -160,7 +160,7 @@ background : green;
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="update_button_2">
+        <widget class="QPushButton" name="continue_button_info">
          <property name="minimumSize">
           <size>
            <width>350</width>

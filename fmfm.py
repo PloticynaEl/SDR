@@ -80,7 +80,6 @@ class fmfm(gr.top_block, Qt.QWidget):
         ##################################################
         self.samp_rate_2 = samp_rate_2 = 48000
         self.samp_rate = samp_rate = 6000000
-        self.base_freq_0 = base_freq_0 = 6000000
         self.base_freq = base_freq = 101500000
 
         ##################################################
@@ -234,12 +233,6 @@ class fmfm(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-
-    def get_base_freq_0(self):
-        return self.base_freq_0
-
-    def set_base_freq_0(self, base_freq_0):
-        self.base_freq_0 = base_freq_0
 
     def get_base_freq(self):
         return self.base_freq

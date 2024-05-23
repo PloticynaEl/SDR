@@ -272,14 +272,14 @@ selection-background-color: lightgreen;
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QComboBox" name="comboBox_sampl_">
-              <property name="maximumSize">
+             <widget class="QComboBox" name="comboBox_sampl">
+              <property name="minimumSize">
                <size>
                 <width>300</width>
                 <height>50</height>
                </size>
               </property>
-              <property name="sizeIncrement">
+              <property name="maximumSize">
                <size>
                 <width>300</width>
                 <height>50</height>
@@ -288,7 +288,7 @@ selection-background-color: lightgreen;
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>-1</pointsize>
+                <pointsize>14</pointsize>
                 <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>
@@ -301,7 +301,7 @@ selection-background-color: lightgreen;
                <string/>
               </property>
               <property name="currentIndex">
-               <number>-1</number>
+               <number>14</number>
               </property>
               <property name="frame">
                <bool>true</bool>
@@ -310,10 +310,22 @@ selection-background-color: lightgreen;
             </item>
             <item row="1" column="1">
              <widget class="QDoubleSpinBox" name="doubleSpinBox_freq">
+              <property name="minimumSize">
+               <size>
+                <width>300</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>300</width>
+                <height>50</height>
+               </size>
+              </property>
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>-1</pointsize>
+                <pointsize>14</pointsize>
                 <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>
@@ -464,7 +476,7 @@ selection-background-color: lightgreen;
         </widget>
        </item>
        <item alignment="Qt::AlignTop">
-        <widget class="QPushButton" name="update_button_demod">
+        <widget class="QPushButton" name="continue_button_demod">
          <property name="minimumSize">
           <size>
            <width>350</width>

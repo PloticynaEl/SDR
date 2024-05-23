@@ -1,38 +1,17 @@
 import sys
+import time
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox, QFileDialog
+#USB
 import re
 import subprocess
 import SoapySDR
 import fmfm_wav_iq
 import os
 import datetime
+
+
 from pathlib import Path
-
-class Window0(QDialog):
-    def __init__(self):
-        super().__init__()
-        uic.loadUi('window_server_client.ui',self)
-        self.pushButton_server.clicked.connect(self.button_server)
-        self.pushButton_client.clicked.connect(self.button_client)
-
-    def button_server(self):
-        self.close()
-        self.openWindow_server()
-
-    def button_client(self):
-        self.close()
-        self.openWindow1()
-
-    def openWindow1(self):
-        global window1
-        self.window1 = Window1()
-        self.window1.show()
-
-    def openWindow_server(self):
-        global window_server
-        self.window_server = Window_server()
-        self.window_server.show()
 
 
 class Window1(QMainWindow):
@@ -43,9 +22,7 @@ class Window1(QMainWindow):
         self.comboBox_devices.activated.connect(self.comboBox_activated)
 
     def button_continue_1(self):
-        DEVICE = None
-        if DEVICE != None:
-            self.openWindow5()
+        self.openWindow5()
 
     def comboBox_activated(self, index):
         if index == 0:
@@ -80,15 +57,6 @@ class Window1(QMainWindow):
     def openWindow6(self):
         self.window6 = Window6() # path
         self.window6.exec_()
-
-class Window_server(QDialog):
-    def __init__(self):
-        super().__init__()
-        uic.loadUi('window_server.ui',self)
-        self.pushButton_run.clicked.connect(self.button_run)
-
-    def button_run(self):
-        print("server run")
 
 class Window2(QDialog): #REMOUTE
     def __init__(self):
@@ -174,7 +142,6 @@ class Window4(QDialog): #SoapySDR(USB)
         window1.comboBox_devices.addItem(self.listWidget_usb.selectedIndexes()[0].data())
         window1.comboBox_devices.setCurrentIndex(window1.comboBox_devices.count() - 1)
         self.close()
-
         self.device = SDRDevice("sdrplay")
         self.device.print_info()
 
@@ -238,7 +205,6 @@ class Window5(QDialog): # demodulation
         # self.pushButton_cancel.clicked.connect(lambda: self.close())
         if (fmfm_wav_iq.REMOUTE == False):
             self.device = SDRDevice('sdrplay')
-            #self.device = SDRDevice(DEVICE)
             self.text2 = self.device.get_text()
             self.textEdit.setText(str(self.text2))
             for i in self.device.sample_rates:
@@ -250,11 +216,15 @@ class Window5(QDialog): # demodulation
 
     def start_DSP(self):
         fmfm_wav_iq.BASE_FREQ = self.doubleSpinBox_freq.value() * 1000000
+        print(fmfm_wav_iq.BASE_FREQ)
         sampl_currentText = self.comboBox_sampl.currentText()
+        print(sampl_currentText)
         dot_index = sampl_currentText.find('.')
+        print(dot_index)
         if dot_index > -1:
             sampl_currentText = sampl_currentText[:dot_index]
         fmfm_wav_iq.SAMP_RATE = int(sampl_currentText)
+        print(fmfm_wav_iq.SAMP_RATE)
         self.close()
         fmfm_wav_iq.fmfm_start_dsp()
 
@@ -292,11 +262,7 @@ class Window6(QDialog): # select path
             fmfm_wav_iq.DIRECTORY_PATH = str(path)
             self.lineEdit_path.setText(str(path))
             self.textEdit_path.setText(str(os.path.join(path,"SDR_%s_%dkHz_RF.wav"
-                                                        % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"),
-                                                        2 / 1000)))+"\n"+
-                                       str(os.path.join(path,"SDR_%s_%dkHz_RF.iq"
-                                       % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"),
-                                       2 / 1000))))
+                                                        % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"), 2 / 1000)))+"\n"+str(os.path.join(path,"SDR_%s_%dkHz_RF.iq" % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"), 2 / 1000))))
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Внимание',
@@ -310,6 +276,6 @@ class Window6(QDialog): # select path
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window0 = Window0()
-    window0.show()
+    window1 = Window1()
+    window1.show()
     sys.exit(app.exec_())
