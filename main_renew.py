@@ -1,105 +1,76 @@
 import sys
+import time
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QDialog, QMainWindow, QMessageBox, QFileDialog
+#USB
 import re
 import subprocess
 import SoapySDR
 import fmfm_wav_iq
 import os
 import datetime
+
+
 from pathlib import Path
 
-DEVICE = None
 
-class Window0(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        uic.loadUi('win_start.ui',self)
-        self.pushButton_server.clicked.connect(self.openWindow_server)
-        self.pushButton_client.clicked.connect(self.openWindow_client)
-
-    def openWindow_server(self):
-        global window_server
-        self.close()
-        window_server = Window_server()
-        window_server.show()
-    def openWindow_client(self):
-        global window_client
-        self.close()
-        window_client = Window_client()
-        window_client.show()
-
-class Window_server(QDialog):
-    def __init__(self):
-        super().__init__()
-        uic.loadUi('win_server.ui',self)
-        self.run_button_remoute.clicked.connect(self.button_run)
-        self.cancel_button_remoute.clicked.connect(self.button_cancel)
-
-    def button_run(self):
-        print("server run")
-
-    def button_cancel(self):
-        self.close()
-        window0.show()
-
-class Window_client(QMainWindow):
+class Window1(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi('win_client.ui',self)
-        self.pushButton_conti_client.clicked.connect(self.button_continue)
+        self.pushButton_conti_client.clicked.connect(self.button_continue_1)
         self.comboBox_devices.activated.connect(self.comboBox_activated)
 
-    def button_continue(self):
-    #if DEVICE != None:
-        print("sdr connect")
-        # запускаем окно с информацией о устройстве
-        self.close()
-        #window_info = Window_info()
-        #window_info.exec_()
-        window_demod = Window_demod()
-        window_demod.exec_()
-
-
+    def button_continue_1(self):
+        self.openWindow5()
 
     def comboBox_activated(self, index):
         if index == 0:
             pass
         elif index == 1:
-            # запускаем окно настройки удаленного подключения
-            global window_remoute
-            window_remoute = Window_remoute()  # REMOUTE
-            window_remoute.exec_()
+            self.openWindow2()
         elif index == 2:
-            # запускаем окно с выбором устройства usb
-            global window_usb
-            window_usb = Window_usb()  # USB
-            window_usb.exec_()
+            self.openWindow3()
         elif index == 3:
-            # запускаем окно с выбором устройства soapy
-            global window_soapy
-            window_soapy = Window_soapy()
-            window_soapy.exec_()
+            self.openWindow4()
 
+    def openWindow2(self):
+        # запускаем окно настройки удаленного подключения
+        self.window2 = Window2() # REMOUTE
+        self.window2.exec_()
 
+    def openWindow3(self):
+        # запускаем окно с выбором устройства usb
+        self.window3 = Window3() #USB
+        self.window3.exec_()
 
-    def openWindow_path(self):
-        self.window_path = Window_path() # path
-        self.window_path.exec_()
+    def openWindow4(self):
+        # запускаем окно с выбором устройства soapy
+        self.window4 = Window4()
+        self.window4.exec_()
 
+    def openWindow5(self):
+        # запускаем окно с вариантами демодуляции
+        self.window5 = Window5() # demodulation
+        self.window5.exec_()
 
-class Window_remoute(QDialog): #REMOUTE
+    def openWindow6(self):
+        self.window6 = Window6() # path
+        self.window6.exec_()
+
+class Window2(QDialog): #REMOUTE
     def __init__(self):
         super().__init__()
-        uic.loadUi('win_remoute.ui',self)
-        self.continue_button_remoute.clicked.connect(self.pushButton_continue_button_remoute)
-        self.cancel_button_remoute.clicked.connect(lambda: self.close())
+        uic.loadUi('window_remoute.ui',self)
+        self.continue_button_2.clicked.connect(self.pushButton_continue_button_2)
+        self.cancel_button_2.clicked.connect(lambda: self.close())
 
-    def pushButton_continue_button_remoute(self):
+    def pushButton_continue_button_2(self):
         fmfm_wav_iq.REMOUTE = True
-        port = self.textEdit_port_remoute.toPlainText()
+        port = self.textEdit_port.toPlainText()
         fmfm_wav_iq.DRIVER_ID = 'soapy=0,driver=remote,remote=tcp://%s' % port
         self.close()
+
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Внимание',
@@ -110,14 +81,14 @@ class Window_remoute(QDialog): #REMOUTE
         else:
             event.ignore()
 
-class Window_usb(QDialog): #USB
+class Window3(QDialog): #USB
     def __init__(self):
         super().__init__()
-        uic.loadUi('win_usb.ui',self)
+        uic.loadUi('window_usb.ui',self)
         self.device = 0
-        self.cancel_button_usb.clicked.connect(lambda: self.close())
-        self.update_button_usb.clicked.connect(self.pushButton_update_func)
-        self.continue_button_usb.clicked.connect(self.pushButton_choose_func)
+        self.cancel_button_3.clicked.connect(lambda: self.close())
+        self.update_button_3.clicked.connect(self.pushButton_update_func)
+        self.continue_button_3.clicked.connect(self.pushButton_choose_func)
 
 
     def pushButton_update_func(self):
@@ -137,12 +108,10 @@ class Window_usb(QDialog): #USB
 
 
     def pushButton_choose_func(self):
-        window_client.comboBox_devices.addItem(self.listWidget_usb.selectedIndexes()[0].data())
-        window_client.comboBox_devices.setCurrentIndex(window_client.comboBox_devices.count() - 1)
+        window1.comboBox_devices.addItem(self.listWidget_usb.selectedIndexes()[0].data())
+        window1.comboBox_devices.setCurrentIndex(window1.comboBox_devices.count() - 1)
         self.close()
-        self.device = SDRDevice("sdrplay")
-        #DEVICE = True
-        self.device.print_info()
+
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Внимание',
@@ -153,26 +122,29 @@ class Window_usb(QDialog): #USB
         else:
             event.ignore() # Если нет, то событие игнорируется
 
-class Window_soapy(QDialog): #SoapySDR(USB)
+
+class Window4(QDialog): #SoapySDR(USB)
     def __init__(self):
         super().__init__()
-        uic.loadUi('win_usb.ui',self)
-        self.cancel_button_usb.clicked.connect(lambda: self.close())
-        self.update_button_usb.clicked.connect(self.pushButton_update_func)
-        self.continue_button_usb.clicked.connect(self.pushButton_choose_func)
+        uic.loadUi('window_usb.ui',self)
+        self.cancel_button_3.clicked.connect(lambda: self.close())
+        self.update_button_3.clicked.connect(self.pushButton_update_func)
+        self.continue_button_3.clicked.connect(self.pushButton_choose_func)
+
 
     def pushButton_update_func(self):
         self.listWidget_usb.clear()
         for d in SoapySDR.Device.enumerate(''):
             self.listWidget_usb.addItem(str(d['label'] ))
 
+
     def pushButton_choose_func(self):
-        window_client.comboBox_devices.addItem(self.listWidget_usb.selectedIndexes()[0].data())
-        window_client.comboBox_devices.setCurrentIndex(window_client.comboBox_devices.count() - 1)
+        window1.comboBox_devices.addItem(self.listWidget_usb.selectedIndexes()[0].data())
+        window1.comboBox_devices.setCurrentIndex(window1.comboBox_devices.count() - 1)
         self.close()
         self.device = SDRDevice("sdrplay")
-        DEVICE = True
         self.device.print_info()
+
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Внимание',
@@ -188,24 +160,20 @@ class SDRDevice():
         self.soapy_device = soapy_device
         self.sample_rates = []
         fmfm_wav_iq.DRIVER_ID[0] = soapy_device
-        self.device = self.soap()
-    def soap(self):
-        global SELFDEVICE
-        SELFDEVICE = SoapySDR.Device(dict(driver=self.soapy_device))
-        return SELFDEVICE
+        self.device = SoapySDR.Device(dict(driver=self.soapy_device))
 
     def print_info(self):
         channels = list(range(self.device.getNumChannels(SoapySDR.SOAPY_SDR_RX)))
         ch = channels[0]
         self.sample_rates = self.device.listSampleRates(SoapySDR.SOAPY_SDR_RX, ch)
         for i in self.sample_rates:
-            window_client.comboBox_first_samp_freq.addItem(str(i))
-        window_client.comboBox_first_samp_freq.setCurrentIndex(0)
+            window1.comboBox_first_samp_freq.addItem(str(i))
+        window1.comboBox_first_samp_freq.setCurrentIndex(0)
 
         bandwidths = list(map(lambda r: int(r.maximum()), self.device.getBandwidthRange(SoapySDR.SOAPY_SDR_RX, ch)))
         for i in bandwidths:
-            window_client.comboBox_bandwidth.addItem(str(i))
-        window_client.comboBox_bandwidth.setCurrentIndex(0)
+            window1.comboBox_bandwidth.addItem(str(i))
+        window1.comboBox_bandwidth.setCurrentIndex(0)
 
     def get_text(self):
         channels = list(range(self.device.getNumChannels(SoapySDR.SOAPY_SDR_RX)))
@@ -230,41 +198,21 @@ class SDRDevice():
         text += "Frequency range:" +str( self.device.getFrequencyRange(SoapySDR.SOAPY_SDR_RX, ch, frequency_name)[0])
         return text
 
-class Window_info(QMainWindow):
+class Window5(QDialog): # demodulation 62500.0 6000000.0
     def __init__(self):
         super().__init__()
-        uic.loadUi('win_info.ui',self)
-        # self.pushButton_cancel.clicked.connect(lambda: self.close())
-        #if (fmfm_wav_iq.REMOUTE == False):
-            #self.device = window_usb.device.device
-            #self.device = SDRDevice(DEVICE)
-            #self.text2 = window_usb.device.device.get_text()
-            #self.textEdit.setText(str(self.text2))
-
-        self.cancel_button_info.clicked.connect(lambda: self.close())
-        self.continue_button_info.clicked.connect(self.button_continue)
-
-
-    def button_continue(self):
-        # запускаем окно демодуляции
-        self.close()
-        window_demod = Window_demod()
-        window_demod.exec_()
-
-class Window_demod(QDialog): # demodulation
-    def __init__(self):
-        super().__init__()
-        uic.loadUi('win_demodulation.ui',self)
+        uic.loadUi('window_demodulation.ui',self)
         # self.pushButton_cancel.clicked.connect(lambda: self.close())
         if (fmfm_wav_iq.REMOUTE == False):
-            print("print")
-            #self.device = window_usb.device.device
-            #self.device = SDRDevice(DEVICE)
-            #for i in self.device.sample_rates:
-                #self.comboBox_sampl.addItem(str(i))
-            #self.comboBox_sampl.setCurrentIndex(0)
-        self.cancel_button_demod.clicked.connect(lambda: self.close())
-        self.continue_button_demod.clicked.connect(self.start_DSP)
+            print("ivijiv")
+            self.device = SDRDevice('sdrplay')
+            self.text2 = self.device.get_text()
+            self.textEdit.setText(str(self.text2))
+            for i in self.device.sample_rates:
+                self.comboBox_sampl.addItem(str(i))
+            self.comboBox_sampl.setCurrentIndex(0)
+        self.cancel_button_4.clicked.connect(lambda: self.close())
+        self.continue_button_4.clicked.connect(self.start_DSP)
         self.checkBox.stateChanged.connect(self.onStateChanged)
 
     def start_DSP(self):
@@ -284,7 +232,7 @@ class Window_demod(QDialog): # demodulation
     def onStateChanged(self):
         if self.checkBox.isChecked():
             # Запись файлов
-            Window_client.openWindow_path(window_client)
+            Window1.openWindow6(window1)
             fmfm_wav_iq.SAVE=True
         else:
             # Без записи файлов
@@ -300,12 +248,12 @@ class Window_demod(QDialog): # demodulation
         else:
             event.ignore() # Если нет, то событие игнорируется
 
-class Window_path(QDialog): # select path
+class Window6(QDialog): # select path
     def __init__(self):
         super().__init__()
-        uic.loadUi('win_path.ui',self)
-        self.cancel_button_path.clicked.connect(lambda: self.close())
-        self.continue_button_path.clicked.connect(lambda: self.close())
+        uic.loadUi('window_path.ui',self)
+        self.cancel_button_5.clicked.connect(lambda: self.close())
+        self.continue_button_5.clicked.connect(lambda: self.close())
         self.path_button.clicked.connect(self.open_dir_dialog)
 
     def open_dir_dialog(self):
@@ -315,11 +263,7 @@ class Window_path(QDialog): # select path
             fmfm_wav_iq.DIRECTORY_PATH = str(path)
             self.lineEdit_path.setText(str(path))
             self.textEdit_path.setText(str(os.path.join(path,"SDR_%s_%dkHz_RF.wav"
-                                                        % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"),
-                                                        2 / 1000)))+"\n"+
-                                       str(os.path.join(path,"SDR_%s_%dkHz_RF.iq"
-                                       % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"),
-                                       2 / 1000))))
+                                                        % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"), 2 / 1000)))+"\n"+str(os.path.join(path,"SDR_%s_%dkHz_RF.iq" % (datetime.datetime.utcnow().strftime("%Y%m%d_%H%M%SZ"), 2 / 1000))))
 
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Внимание',
@@ -332,8 +276,7 @@ class Window_path(QDialog): # select path
 
 
 if __name__ == '__main__':
-    global window0
     app = QApplication(sys.argv)
-    window0 = Window0()
-    window0.show()
+    window1 = Window1()
+    window1.show()
     sys.exit(app.exec_())

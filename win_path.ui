@@ -110,7 +110,7 @@ background : green;
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
-       <widget class="QLineEdit" name="lineEdit_path_2">
+       <widget class="QLineEdit" name="lineEdit_path">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -263,7 +263,7 @@ background : green;
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <widget class="QPushButton" name="cancel_button_2">
+       <widget class="QPushButton" name="cancel_button_path">
         <property name="minimumSize">
          <size>
           <width>350</width>
@@ -294,7 +294,7 @@ background : green;
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="update_button_2">
+       <widget class="QPushButton" name="continue_button_path">
         <property name="minimumSize">
          <size>
           <width>350</width>
