@@ -29,7 +29,7 @@ class Window0(QMainWindow):
         window_client = Window_client()
         window_client.show()
 
-class Window_server(QDialog):
+class Window_server(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi('win_server.ui',self)
@@ -258,11 +258,10 @@ class Window_demod(QDialog): # demodulation
         # self.pushButton_cancel.clicked.connect(lambda: self.close())
         if (fmfm_wav_iq.REMOUTE == False):
             print("print")
-            #self.device = window_usb.device.device
-            #self.device = SDRDevice(DEVICE)
-            #for i in self.device.sample_rates:
-                #self.comboBox_sampl.addItem(str(i))
-            #self.comboBox_sampl.setCurrentIndex(0)
+            self.device = SDRDevice('sdrplay')
+            for i in self.device.sample_rates:
+                self.comboBox_sampl.addItem(str(i))
+            self.comboBox_sampl.setCurrentIndex(0)
         self.cancel_button_demod.clicked.connect(lambda: self.close())
         self.continue_button_demod.clicked.connect(self.start_DSP)
         self.checkBox.stateChanged.connect(self.onStateChanged)

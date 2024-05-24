@@ -201,18 +201,18 @@ class SDRDevice():
 class Window5(QDialog): # demodulation 62500.0 6000000.0
     def __init__(self):
         super().__init__()
-        uic.loadUi('window_demodulation.ui',self)
+        uic.loadUi('win_demodulation.ui',self)
         # self.pushButton_cancel.clicked.connect(lambda: self.close())
         if (fmfm_wav_iq.REMOUTE == False):
             print("ivijiv")
             self.device = SDRDevice('sdrplay')
-            self.text2 = self.device.get_text()
-            self.textEdit.setText(str(self.text2))
+            #self.text2 = self.device.get_text()
+            #self.textEdit.setText(str(self.text2))
             for i in self.device.sample_rates:
                 self.comboBox_sampl.addItem(str(i))
             self.comboBox_sampl.setCurrentIndex(0)
-        self.cancel_button_4.clicked.connect(lambda: self.close())
-        self.continue_button_4.clicked.connect(self.start_DSP)
+        self.cancel_button_demod.clicked.connect(lambda: self.close())
+        self.continue_button_demod.clicked.connect(self.start_DSP)
         self.checkBox.stateChanged.connect(self.onStateChanged)
 
     def start_DSP(self):

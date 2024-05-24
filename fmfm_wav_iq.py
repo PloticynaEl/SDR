@@ -10,7 +10,7 @@
 # GNU Radio version: 3.10.1.1
 
 from packaging.version import Version as StrictVersion
-from PyQt5 import Qt
+from PyQt5 import Qt, QtCore
 import sip
 import os
 import datetime
@@ -47,6 +47,13 @@ class fmfm(gr.top_block, Qt.QWidget):
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
         except:
             pass
+        self.resize(800, 480)
+        self.setMinimumSize(QtCore.QSize(800, 480))
+        self.setMaximumSize(QtCore.QSize(800, 480))
+        self.setBaseSize(QtCore.QSize(800, 480))
+        self.setStyleSheet("background-color: white; ")
+
+        self.setStyleSheet("color: #0d6efd; font: normal normal 27px \"Arial\";  background-color: white; ")
         self.top_scroll_layout = Qt.QVBoxLayout()
         self.setLayout(self.top_scroll_layout)
         self.top_scroll = Qt.QScrollArea()
