@@ -21,6 +21,25 @@ QLabel{
  background-color: #fff;
 }
 
+QScrollBar:vertical { 
+min-width : 40px;
+max-width : 40px;
+background-color: #0d6efd;
+  }
+QScrollBar::handle:vertical { 
+min-height: 30px;
+background-color: rgb(115, 210, 22);
+border-radius: 7px;
+margin-top:15px;
+margin-bottom:15px;
+  }
+QScrollBar::handle:vertical:hover {
+background-color: rgb(138, 226, 52);
+} 
+QScrollBar::handle:vertical:pressed {
+background-color: rgb(193, 255, 14);
+} 
+
 QPushButton {
   background-color: #0d6efd;
   color: #fff;
@@ -123,6 +142,12 @@ background : green;
          <width>780</width>
          <height>300</height>
         </size>
+       </property>
+       <property name="font">
+        <font>
+         <family>Arial</family>
+         <pointsize>14</pointsize>
+        </font>
        </property>
       </widget>
      </item>
