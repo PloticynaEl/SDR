@@ -154,37 +154,6 @@ background : green;
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <item>
-        <widget class="QPushButton" name="cancel_button_info">
-         <property name="minimumSize">
-          <size>
-           <width>350</width>
-           <height>70</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>350</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="sizeIncrement">
-          <size>
-           <width>300</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="font">
-          <font>
-           <family>Arial</family>
-           <pointsize>14</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Отмена</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QPushButton" name="continue_button_info">
          <property name="minimumSize">
           <size>
