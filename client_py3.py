@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: GPL-3.0
 #
 # GNU Radio Python Flow Graph
-# Title: client
+# Title: client_py3
 # Author: eleonora
 # GNU Radio version: 3.10.1.1
 
@@ -38,12 +38,12 @@ from gnuradio import network
 
 from gnuradio import qtgui
 
-class client(gr.top_block, Qt.QWidget):
+class client_py3(gr.top_block, Qt.QWidget):
 
     def __init__(self):
-        gr.top_block.__init__(self, "client", catch_exceptions=True)
+        gr.top_block.__init__(self, "client_py3", catch_exceptions=True)
         Qt.QWidget.__init__(self)
-        self.setWindowTitle("client")
+        self.setWindowTitle("client_py3")
         qtgui.util.check_set_qss()
         try:
             self.setWindowIcon(Qt.QIcon.fromTheme('gnuradio-grc'))
@@ -61,7 +61,7 @@ class client(gr.top_block, Qt.QWidget):
         self.top_grid_layout = Qt.QGridLayout()
         self.top_layout.addLayout(self.top_grid_layout)
 
-        self.settings = Qt.QSettings("GNU Radio", "client")
+        self.settings = Qt.QSettings("GNU Radio", "client_py3")
 
         try:
             if StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
@@ -76,6 +76,7 @@ class client(gr.top_block, Qt.QWidget):
         ##################################################
         self.samp_rate = samp_rate = 1000000
         self.port = port = 2000
+        self.base_freq = base_freq = 101500000
         self.address = address = '192.168.122.228'
 
         ##################################################
@@ -84,7 +85,7 @@ class client(gr.top_block, Qt.QWidget):
         self.qtgui_sink_x_0 = qtgui.sink_c(
             1024, #fftsize
             window.WIN_BLACKMAN_hARRIS, #wintype
-            0, #fc
+            base_freq, #fc
             samp_rate, #bw
             "SDR", #name
             True, #plotfreq
@@ -109,7 +110,7 @@ class client(gr.top_block, Qt.QWidget):
 
 
     def closeEvent(self, event):
-        self.settings = Qt.QSettings("GNU Radio", "client")
+        self.settings = Qt.QSettings("GNU Radio", "client_py3")
         self.settings.setValue("geometry", self.saveGeometry())
         self.stop()
         self.wait()
@@ -121,13 +122,20 @@ class client(gr.top_block, Qt.QWidget):
 
     def set_samp_rate(self, samp_rate):
         self.samp_rate = samp_rate
-        self.qtgui_sink_x_0.set_frequency_range(0, self.samp_rate)
+        self.qtgui_sink_x_0.set_frequency_range(self.base_freq, self.samp_rate)
 
     def get_port(self):
         return self.port
 
     def set_port(self, port):
         self.port = port
+
+    def get_base_freq(self):
+        return self.base_freq
+
+    def set_base_freq(self, base_freq):
+        self.base_freq = base_freq
+        self.qtgui_sink_x_0.set_frequency_range(self.base_freq, self.samp_rate)
 
     def get_address(self):
         return self.address
@@ -138,7 +146,7 @@ class client(gr.top_block, Qt.QWidget):
 
 
 
-def main(top_block_cls=client, options=None):
+def main(top_block_cls=client_py3, options=None):
 
     if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
         style = gr.prefs().get_string('qtgui', 'style', 'raster')

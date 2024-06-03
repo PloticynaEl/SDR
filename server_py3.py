@@ -78,6 +78,8 @@ class server(gr.top_block, Qt.QWidget):
         self.driver = driver = 'sdrplay'
         self.channel = channel = 1
         self.base_freq = base_freq = 101500000
+        self.arguments = arguments = ''
+        self.antenna = antenna = 'RX'
 
         ##################################################
         # Blocks
@@ -147,6 +149,18 @@ class server(gr.top_block, Qt.QWidget):
     def set_base_freq(self, base_freq):
         self.base_freq = base_freq
         self.soapy_custom_source_0.set_frequency(0, self.base_freq)
+
+    def get_arguments(self):
+        return self.arguments
+
+    def set_arguments(self, arguments):
+        self.arguments = arguments
+
+    def get_antenna(self):
+        return self.antenna
+
+    def set_antenna(self, antenna):
+        self.antenna = antenna
 
 
 
