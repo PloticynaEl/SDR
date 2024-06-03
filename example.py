@@ -7,7 +7,7 @@ import sys             # exit on error
 import pprint          # pretty printer
 
 #mydriver    = "remote"     # Ref: "SoapySDRUtil --find"
-mydriver    = "rtlsdr"      # Ref: "SoapySDRUtil --find"
+mydriver    = "sdrplay"      # Ref: "SoapySDRUtil --find"
 mydirection = SOAPY_SDR_RX  # Interested in receiver info
 mychannel   = 0             # Interested in first rx channel
 

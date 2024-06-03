@@ -55,8 +55,6 @@ class Window_client(QMainWindow):
         print("sdr connect")
         # запускаем окно с информацией о устройстве
         self.close()
-        #window_info = Window_info()
-        #window_info.exec_()
         window_demod = Window_demod()
         window_demod.exec_()
 

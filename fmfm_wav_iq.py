@@ -32,7 +32,7 @@ FILENAME = ''
 DIRECTORY_PATH = ''
 DRIVER_ID = ['', '']
 
-SAMP_RATE_2 = 48000
+SAMP_RATE_2 = 0
 SAMP_RATE = 0
 BASE_FREQ = 0
 
@@ -148,7 +148,8 @@ class fmfm(gr.top_block, Qt.QWidget):
         self.qtgui_time_sink_x_0.set_line_alpha(0, alpha)
 
         self._qtgui_time_sink_x_0_win = sip.wrapinstance(self.qtgui_time_sink_x_0.qwidget(), Qt.QWidget)
-        self.top_layout.addWidget(self._qtgui_time_sink_x_0_win)
+
+        #self.top_layout.addWidget(self._qtgui_time_sink_x_0_win)
         self.qtgui_sink_x_0 = qtgui.sink_c(
             16384, # fftsize
             window.WIN_BLACKMAN_hARRIS, # wintype
@@ -261,16 +262,11 @@ class fmfm(gr.top_block, Qt.QWidget):
 
 
 def fmfm_start_dsp(top_block_cls=fmfm, options=None):
-    print("check")
     if StrictVersion("4.5.0") <= StrictVersion(Qt.qVersion()) < StrictVersion("5.0.0"):
         style = gr.prefs().get_string('qtgui', 'style', 'raster')
         Qt.QApplication.setGraphicsSystem(style)
-    print("top_block_cls")
     tb = top_block_cls()
-    print("start")
     tb.start()
-    print("show")
-
     tb.show()
 
     def sig_handler(sig=None, frame=None):

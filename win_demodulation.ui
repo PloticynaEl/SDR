@@ -288,7 +288,7 @@ selection-background-color: lightgreen;
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>-1</pointsize>
+                <pointsize>14</pointsize>
                 <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>
@@ -301,7 +301,7 @@ selection-background-color: lightgreen;
                <string/>
               </property>
               <property name="currentIndex">
-               <number>-1</number>
+               <number>14</number>
               </property>
               <property name="frame">
                <bool>true</bool>
@@ -325,7 +325,7 @@ selection-background-color: lightgreen;
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>-1</pointsize>
+                <pointsize>14</pointsize>
                 <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>
@@ -494,7 +494,7 @@ selection-background-color: lightgreen;
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>-1</pointsize>
+                <pointsize>14</pointsize>
                 <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>
@@ -507,7 +507,7 @@ selection-background-color: lightgreen;
                <string/>
               </property>
               <property name="currentIndex">
-               <number>-1</number>
+               <number>14</number>
               </property>
               <property name="frame">
                <bool>true</bool>
@@ -531,7 +531,7 @@ selection-background-color: lightgreen;
               <property name="font">
                <font>
                 <family>Arial</family>
-                <pointsize>-1</pointsize>
+                <pointsize>14</pointsize>
                 <weight>50</weight>
                 <italic>false</italic>
                 <bold>false</bold>

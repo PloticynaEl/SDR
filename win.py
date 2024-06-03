@@ -424,6 +424,7 @@ class Window_demod(QWidget):
         fmfm_wav_iq.BASE_FREQ = self.doubleSpinBox_freq.value() * 1000000
         print(fmfm_wav_iq.BASE_FREQ)
         sampl_currentText = self.comboBox_sampl.currentText()
+        sampl_audio_currentText = mainwindow.window_client.comboBox_output_samp_freq_2.currentText()
         print(sampl_currentText)
         dot_index = sampl_currentText.find('.')
         print(dot_index)
@@ -431,9 +432,10 @@ class Window_demod(QWidget):
             sampl_currentText = sampl_currentText[:dot_index]
         fmfm_wav_iq.SAMP_RATE = int(sampl_currentText)
         print(fmfm_wav_iq.SAMP_RATE)
+        fmfm_wav_iq.SAMP_RATE_2 = int(sampl_audio_currentText)
+        print(fmfm_wav_iq.SAMP_RATE_2)
         self.hide()
         fmfm_wav_iq.fmfm_start_dsp()
-
 
     def button_cancel(self):
         self.close()
