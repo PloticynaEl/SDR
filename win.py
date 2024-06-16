@@ -39,7 +39,7 @@ class Window_server(QWidget):
 
         # Вызываемые окна
         self.window_usb = Window_usb('server')
-        self.window_soapy = Window_soapy()
+        self.window_soapy = Window_soapy('server')
         self.window_addr = Window_server_addr()
 
 
@@ -58,13 +58,14 @@ class Window_server(QWidget):
         elif index == 3:
             # запускаем окно с выбором устройства soapy
             self.hide()
+            self.window_soapy.ident_parent()
             self.window_soapy.show()
 
     def configuration_file(self):
         self.config = configparser.ConfigParser()
         self.config.add_section('SIGNAL_SOURCE CONFIG')
         self.config.set('SIGNAL_SOURCE CONFIG', 'driver', self.comboBox_devices.currentText())
-        self.config.set('SIGNAL_SOURCE CONFIG', 'sampling_frequency', self.comboBox_first_samp_freq.currentText())
+        self.config.set('SIGNAL_SOURCE CONFIG', 'sampling_frequency', str(self.doubleSpinBox_freq.value() * 1000000))
         self.config.set('SIGNAL_SOURCE CONFIG', 'bandwidth', self.comboBox_bandwidth.currentText())
 
 
@@ -82,8 +83,8 @@ class Window_server_addr(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi('win_server_addr.ui',self)
-        self.run_button_remoute.clicked.connect(self.button_run)
-        self.cancel_button_remoute.clicked.connect(self.button_cancel)
+        self.run_button.clicked.connect(self.button_run)
+        self.cancel_button.clicked.connect(self.button_cancel)
         self.pushButton_1.clicked.connect(self.push_1)
         self.pushButton_2.clicked.connect(self.push_2)
         self.pushButton_3.clicked.connect(self.push_3)
@@ -186,7 +187,7 @@ class Window_client(QWidget):
         self.window_info = Window_info()
         self.window_remoute = Window_remoute()
         self.window_usb = Window_usb('client')
-        self.window_soapy = Window_soapy()
+        self.window_soapy = Window_soapy('client')
         self.window_demod = Window_demod()
 
     def comboBox_activated(self, index):
@@ -318,7 +319,7 @@ class Window_usb(QWidget): #USB
         self.cancel_button_usb.clicked.connect(self.button_cancel)
         self.update_button_usb.clicked.connect(self.pushButton_update_func)
         self.continue_button_usb.clicked.connect(self.pushButton_choose_func)
-        self.window_error = Window_connection_error()
+        self.window_error = Window_connection_error(win_parent)
 
     def pushButton_update_func(self):
         self.listWidget_usb.clear()
@@ -359,6 +360,15 @@ class Window_usb(QWidget): #USB
                 self.win_parent_obj.comboBox_devices.addItem(self.listWidget_usb.selectedIndexes()[0].data())
                 self.win_parent_obj.comboBox_devices.setCurrentIndex(
                     self.win_parent_obj.comboBox_devices.count() - 1)
+                if self.win_parent == 'client':
+                    sample_rates = self.win_parent_obj.device.sample_rates
+                    for i in sample_rates:
+                        self.win_parent_obj.comboBox_first_samp_freq.addItem(str(i))
+                    self.win_parent_obj.comboBox_first_samp_freq.setCurrentIndex(0)
+                bandwidths = self.win_parent_obj.device.bandwidths
+                for i in bandwidths:
+                    self.win_parent_obj.comboBox_bandwidth.addItem(str(i))
+                self.win_parent_obj.comboBox_bandwidth.setCurrentIndex(0)
                 self.hide()
                 if self.win_parent == 'client':
                     self.win_parent_obj.window_info.print()
@@ -367,6 +377,7 @@ class Window_usb(QWidget): #USB
                     self.win_parent_obj.show()
             else:
                 self.hide()
+                self.ident_parent()
                 self.win_parent_obj.window_usb.window_error.textEdit_device.setText(str(string))
                 self.win_parent_obj.window_usb.window_error.show()
 
@@ -384,31 +395,43 @@ class Window_usb(QWidget): #USB
         else:
             event.ignore() # Если нет, то событие игнорируется
 
-class Window_connection_error(QWidget): #USB
-    def __init__(self):
+class Window_connection_error(QWidget):
+    def __init__(self, win_parent):
         super().__init__()
+        self.win_parent = win_parent
         uic.loadUi('win_connection_error.ui',self)
         self.cancel_button.clicked.connect(self.button_cancel)
 
     def button_cancel(self):
         self.close()
         self.hide()
-        mainwindow.window_client.show()
+        if self.win_parent == 'client':
+            mainwindow.window_client.show()
+        elif self.win_parent == 'server':
+            mainwindow.window_server.show()
 
 class Window_soapy(QDialog): #SoapySDR(USB)
-    def __init__(self):
+    def __init__(self,win_parent):
         super().__init__()
         uic.loadUi('win_usb.ui',self)
         self.device = None
+        self.win_parent = win_parent
+        self.win_parent_obj = None
         self.cancel_button_usb.clicked.connect(self.button_cancel)
         self.update_button_usb.clicked.connect(self.pushButton_update_func)
         self.continue_button_usb.clicked.connect(self.pushButton_choose_func)
-        self.window_error = Window_connection_error()
+        self.window_error = Window_connection_error(win_parent)
 
     def pushButton_update_func(self):
         self.listWidget_usb.clear()
         for d in SoapySDR.Device.enumerate(''):
             self.listWidget_usb.addItem(str(d['label'] ))
+
+    def ident_parent(self):
+        if self.win_parent == 'server':
+            self.win_parent_obj = mainwindow.window_server
+        elif self.win_parent == 'client':
+            self.win_parent_obj = mainwindow.window_client
 
     def pushButton_choose_func(self):
         devices = ['airspy', 'bladerf', 'hackrf', 'lime', 'osmosdr',
@@ -525,6 +548,7 @@ class SDRDevice():
     def __init__(self,soapy_device):
         self.soapy_device = soapy_device
         self.sample_rates = []
+        self.bandwidths = []
         fmfm_wav_iq.DRIVER_ID[0] = soapy_device
         self.device = SoapySDR.Device(dict(driver=self.soapy_device))
 
@@ -563,14 +587,10 @@ class SDRDevice():
         channels = list(range(self.device.getNumChannels(SoapySDR.SOAPY_SDR_RX)))
         ch = channels[0]
         self.sample_rates = self.device.listSampleRates(SoapySDR.SOAPY_SDR_RX, ch)
-        for i in self.sample_rates:
-            mainwindow.window_client.comboBox_first_samp_freq.addItem(str(i))
-        mainwindow.window_client.comboBox_first_samp_freq.setCurrentIndex(0)
+        self.bandwidths = list(map(lambda r: int(r.maximum()), self.device.getBandwidthRange(SoapySDR.SOAPY_SDR_RX, ch)))
 
-        bandwidths = list(map(lambda r: int(r.maximum()), self.device.getBandwidthRange(SoapySDR.SOAPY_SDR_RX, ch)))
-        for i in bandwidths:
-            mainwindow.window_client.comboBox_bandwidth.addItem(str(i))
-        mainwindow.window_client.comboBox_bandwidth.setCurrentIndex(0)
+
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
