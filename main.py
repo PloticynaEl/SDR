@@ -32,7 +32,7 @@ class Window0(QMainWindow):
 class Window_server(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi('win_server.ui',self)
+        uic.loadUi('win_server_addr.ui',self)
         self.run_button_remoute.clicked.connect(self.button_run)
         self.cancel_button_remoute.clicked.connect(self.button_cancel)
 

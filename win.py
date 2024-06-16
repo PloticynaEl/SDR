@@ -29,11 +29,59 @@ class MainWindow(QMainWindow):
         self.hide()
         self.window_client.show()
 
-
 class Window_server(QWidget):
     def __init__(self):
         super().__init__()
-        uic.loadUi('win_server.ui',self)
+        uic.loadUi('win_server_set.ui',self)
+        self.run_button.clicked.connect(self.button_run)
+        self.cancel_button.clicked.connect(self.button_cancel)
+        self.comboBox_devices.activated.connect(self.comboBox_activated)
+
+        # Вызываемые окна
+        self.window_usb = Window_usb('server')
+        self.window_soapy = Window_soapy()
+        self.window_addr = Window_server_addr()
+
+
+    def comboBox_activated(self, index):
+        if index == 0:
+            pass
+        elif index == 1:
+            # запускаем окно настройки удаленного подключения
+            self.hide()
+            self.window_remoute.show()
+        elif index == 2:
+            # запускаем окно с выбором устройства usb
+            self.hide()
+            self.window_usb.ident_parent()
+            self.window_usb.show()
+        elif index == 3:
+            # запускаем окно с выбором устройства soapy
+            self.hide()
+            self.window_soapy.show()
+
+    def configuration_file(self):
+        self.config = configparser.ConfigParser()
+        self.config.add_section('SIGNAL_SOURCE CONFIG')
+        self.config.set('SIGNAL_SOURCE CONFIG', 'driver', self.comboBox_devices.currentText())
+        self.config.set('SIGNAL_SOURCE CONFIG', 'sampling_frequency', self.comboBox_first_samp_freq.currentText())
+        self.config.set('SIGNAL_SOURCE CONFIG', 'bandwidth', self.comboBox_bandwidth.currentText())
+
+
+    def button_cancel(self):
+        self.hide()
+        mainwindow.show()
+
+    def button_run(self):
+        if (self.device is not None):
+            self.hide()
+            self.configuration_file()
+            self.window_addr.show()
+
+class Window_server_addr(QWidget):
+    def __init__(self):
+        super().__init__()
+        uic.loadUi('win_server_addr.ui',self)
         self.run_button_remoute.clicked.connect(self.button_run)
         self.cancel_button_remoute.clicked.connect(self.button_cancel)
         self.pushButton_1.clicked.connect(self.push_1)
@@ -55,13 +103,23 @@ class Window_server(QWidget):
 
     def button_cancel(self):
         self.hide()
-        mainwindow.show()
+        mainwindow.window_server.show()
         self.textEdit_port_server.setText("___.__.__.___: ____")
 
     def button_run(self):
         self.hide()
         address_run = self.textEdit_port_server.toPlainText()
+        self.configuration_file()
         self.window_run.show()
+
+    def configuration_file(self):
+        mainwindow.window_server.config.add_section('PATH')
+        text = self.textEdit_port_server.toPlainText()
+        addr, port = text.split(':')
+        mainwindow.window_server.config.set('PATH', 'addr', addr)
+        mainwindow.window_server.config.set('PATH', 'port', port)
+        with open('myconfig_server.conf', 'w') as config_file:
+            mainwindow.window_server.config.write(config_file)
     def cursor_input(self, input):
         text = self.textEdit_port_server.toPlainText()
         position = 0
@@ -109,7 +167,7 @@ class Window_server(QWidget):
 class Window_run(QWidget):
     def __init__(self):
         super().__init__()
-        uic.loadUi('win_run.ui', self)
+        uic.loadUi('win_server_run.ui', self)
         self.stop_button_run.clicked.connect(self.button_stop)
 
     def button_stop(self):
@@ -121,12 +179,13 @@ class Window_client(QWidget):
         super().__init__()
         uic.loadUi('win_client.ui', self)
         self.device = None
+        self.name_device = None
         self.config = None
         self.pushButton_conti_client.clicked.connect(self.button_continue)
         self.comboBox_devices.activated.connect(self.comboBox_activated)
         self.window_info = Window_info()
         self.window_remoute = Window_remoute()
-        self.window_usb = Window_usb()
+        self.window_usb = Window_usb('client')
         self.window_soapy = Window_soapy()
         self.window_demod = Window_demod()
 
@@ -156,9 +215,10 @@ class Window_client(QWidget):
     def configuration_file(self):
         self.config = configparser.ConfigParser()
         self.config.add_section('SIGNAL_SOURCE CONFIG')
+        self.config.set('SIGNAL_SOURCE CONFIG', 'driver', self.name_device)
         self.config.set('SIGNAL_SOURCE CONFIG', 'sampling_frequency', self.comboBox_first_samp_freq.currentText())
-        self.config.set('SIGNAL_SOURCE CONFIG', 'driver', 'sss')
-        with open('myconfig.conf', 'w') as config_file:
+        self.config.set('SIGNAL_SOURCE CONFIG', 'bandwidth', self.comboBox_bandwidth.currentText())
+        with open('myconfig_client.conf', 'w') as config_file:
             self.config.write(config_file)
 
 
@@ -249,10 +309,12 @@ class Window_remoute(QWidget): #REMOUTE
             event.ignore()
 
 class Window_usb(QWidget): #USB
-    def __init__(self):
+    def __init__(self,win_parent):
         super().__init__()
         uic.loadUi('win_usb.ui',self)
         self.device = None
+        self.win_parent = win_parent
+        self.win_parent_obj = None
         self.cancel_button_usb.clicked.connect(self.button_cancel)
         self.update_button_usb.clicked.connect(self.pushButton_update_func)
         self.continue_button_usb.clicked.connect(self.pushButton_choose_func)
@@ -272,7 +334,11 @@ class Window_usb(QWidget): #USB
                     devices.append(dinfo)
         for i in devices:
             self.listWidget_usb.addItem(i['tag'])
-
+    def ident_parent(self):
+        if self.win_parent == 'server':
+            self.win_parent_obj = mainwindow.window_server
+        elif self.win_parent == 'client':
+            self.win_parent_obj = mainwindow.window_client
     def pushButton_choose_func(self):
         devices =['airspy', 'bladerf', 'hackrf', 'lime', 'osmosdr',
                   'redpitaya', 'rfspace', 'rtlsdr', 'sdrplay']
@@ -285,26 +351,30 @@ class Window_usb(QWidget): #USB
                 for ii in devices:
                     if i == ii:
                         self.device = ii
+
             if (self.device is not None):
-                mainwindow.window_client.device = SDRDevice(self.device)
-                mainwindow.window_client.device.print_info()
-                mainwindow.window_client.comboBox_devices.addItem(self.listWidget_usb.selectedIndexes()[0].data())
-                mainwindow.window_client.comboBox_devices.setCurrentIndex(
-                    mainwindow.window_client.comboBox_devices.count() - 1)
+                self.win_parent_obj.name_device = self.device
+                self.win_parent_obj.device = SDRDevice(self.device)
+                self.win_parent_obj.device.print_info()
+                self.win_parent_obj.comboBox_devices.addItem(self.listWidget_usb.selectedIndexes()[0].data())
+                self.win_parent_obj.comboBox_devices.setCurrentIndex(
+                    self.win_parent_obj.comboBox_devices.count() - 1)
                 self.hide()
-                mainwindow.window_client.window_info.print()
-                mainwindow.window_client.window_info.show()
+                if self.win_parent == 'client':
+                    self.win_parent_obj.window_info.print()
+                    self.win_parent_obj.window_info.show()
+                elif self.win_parent == 'server':
+                    self.win_parent_obj.show()
             else:
                 self.hide()
-                mainwindow.window_client.window_usb.window_error.textEdit_device.setText(str(string))
-                mainwindow.window_client.window_usb.window_error.show()
+                self.win_parent_obj.window_usb.window_error.textEdit_device.setText(str(string))
+                self.win_parent_obj.window_usb.window_error.show()
 
-        #self.device.print_info()
 
     def button_cancel(self):
         self.close()
         self.hide()
-        mainwindow.window_client.show()
+        self.win_parent_obj.show()
     def closeEvent(self, event):
         reply = QMessageBox.question(self, 'Внимание',
                                      "Продолжть?",
@@ -353,6 +423,7 @@ class Window_soapy(QDialog): #SoapySDR(USB)
                     if i == ii:
                         self.device = ii
             if (self.device is not None):
+                mainwindow.window_client.name_device = self.device
                 mainwindow.window_client.device = SDRDevice(self.device)
                 mainwindow.window_client.device.print_info()
                 mainwindow.window_client.comboBox_devices.addItem(self.listWidget_usb.selectedIndexes()[0].data())

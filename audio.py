@@ -12,3 +12,5 @@ for line in device_string:
  if(line.find("карта") != -1):
   print("hw:" + line[line.find("карта")+6] + "," + line[line.find("устройство")+11])
 
+
+
