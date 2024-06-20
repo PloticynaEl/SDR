@@ -7,13 +7,17 @@ import re
 import subprocess
 import SoapySDR
 import fmfm_wav_iq
+import server_py3
+import am_waw_iq
 import configparser
+import os
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         uic.loadUi('win_start.ui', self)
+        # Обслуживаемые виджеты
         self.pushButton_server.clicked.connect(self.openWindow_server)
         self.pushButton_client.clicked.connect(self.openWindow_client)
         # Вызываемые окна
@@ -33,6 +37,7 @@ class Window_server(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi('win_server_set.ui',self)
+        # Обслуживаемые виджеты
         self.run_button.clicked.connect(self.button_run)
         self.cancel_button.clicked.connect(self.button_cancel)
         self.comboBox_devices.activated.connect(self.comboBox_activated)
@@ -83,6 +88,7 @@ class Window_server_addr(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi('win_server_addr.ui',self)
+        # Обслуживаемые виджеты
         self.run_button.clicked.connect(self.button_run)
         self.cancel_button.clicked.connect(self.button_cancel)
         self.pushButton_1.clicked.connect(self.push_1)
@@ -114,11 +120,11 @@ class Window_server_addr(QWidget):
         self.window_run.show()
 
     def configuration_file(self):
-        mainwindow.window_server.config.add_section('PATH')
+        mainwindow.window_server.config.add_section('ADDRESS')
         text = self.textEdit_port_server.toPlainText()
         addr, port = text.split(':')
-        mainwindow.window_server.config.set('PATH', 'addr', addr)
-        mainwindow.window_server.config.set('PATH', 'port', port)
+        mainwindow.window_server.config.set('ADDRESS', 'addr', addr)
+        mainwindow.window_server.config.set('ADDRESS', 'port', port)
         with open('myconfig_server.conf', 'w') as config_file:
             mainwindow.window_server.config.write(config_file)
     def cursor_input(self, input):
@@ -171,6 +177,16 @@ class Window_run(QWidget):
         uic.loadUi('win_server_run.ui', self)
         self.stop_button_run.clicked.connect(self.button_stop)
 
+    def start_server(self):
+        config = configparser.ConfigParser()
+        config.read('myconfig_server.conf')
+        server_py3.DRIVER = config.get('SIGNAL_SOURCE CONFIG', 'driver')
+        server_py3.BASE_FREQ = int(config.get('SIGNAL_SOURCE CONFIG', 'sampling_frequency'))
+        server_py3.SAMP_RATE = int(config.get('SIGNAL_SOURCE CONFIG', 'bandwidth'))
+        server_py3.ADDR = int(config.get('ADDRESS', 'addr'))
+        server_py3.PORT = int(config.get('ADDRESS', 'port'))
+        self.hide()
+        server_py3.start_dsp()
     def button_stop(self):
         self.hide()
         mainwindow.window_server.show()
@@ -182,6 +198,7 @@ class Window_client(QWidget):
         self.device = None
         self.name_device = None
         self.config = None
+        # Обслуживаемые виджеты
         self.pushButton_conti_client.clicked.connect(self.button_continue)
         self.comboBox_devices.activated.connect(self.comboBox_activated)
         self.window_info = Window_info()
@@ -189,6 +206,17 @@ class Window_client(QWidget):
         self.window_usb = Window_usb('client')
         self.window_soapy = Window_soapy('client')
         self.window_demod = Window_demod()
+        self.audio()
+
+    def audio(self):
+        devices = os.popen("arecord -l")
+        device_string = devices.read()
+        device_string = device_string.split("\n")
+        for i in range(1, len(device_string), 3):
+            self.comboBox_output_device.addItem(str(device_string[i]))
+        self.comboBox_output_device.setCurrentIndex(0)
+
+
 
     def comboBox_activated(self, index):
         if index == 0:
@@ -222,11 +250,11 @@ class Window_client(QWidget):
         with open('myconfig_client.conf', 'w') as config_file:
             self.config.write(config_file)
 
-
 class Window_remoute(QWidget): #REMOUTE
     def __init__(self):
         super().__init__()
         uic.loadUi('win_remoute.ui',self)
+        # Обслуживаемые виджеты
         self.continue_button_remoute.clicked.connect(self.pushButton_continue_button_remoute)
         self.cancel_button_remoute.clicked.connect(self.button_cancel)
         self.pushButton_1.clicked.connect(self.push_1)
@@ -240,6 +268,7 @@ class Window_remoute(QWidget): #REMOUTE
         self.pushButton_9.clicked.connect(self.push_9)
         self.pushButton_0.clicked.connect(self.push_0)
         self.pushButton_x.clicked.connect(self.clear)
+        # Форматирование текста
         self.font = QFont("Arial", 20)
         self.textEdit_port_remoute.setFont(self.font)
 
@@ -316,9 +345,11 @@ class Window_usb(QWidget): #USB
         self.device = None
         self.win_parent = win_parent
         self.win_parent_obj = None
+        # Обслуживаемые виджеты
         self.cancel_button_usb.clicked.connect(self.button_cancel)
         self.update_button_usb.clicked.connect(self.pushButton_update_func)
         self.continue_button_usb.clicked.connect(self.pushButton_choose_func)
+        # Вызываемые окна
         self.window_error = Window_connection_error(win_parent)
 
     def pushButton_update_func(self):
@@ -352,7 +383,7 @@ class Window_usb(QWidget): #USB
                 for ii in devices:
                     if i == ii:
                         self.device = ii
-
+            self.ident_parent()
             if (self.device is not None):
                 self.win_parent_obj.name_device = self.device
                 self.win_parent_obj.device = SDRDevice(self.device)
@@ -400,6 +431,7 @@ class Window_connection_error(QWidget):
         super().__init__()
         self.win_parent = win_parent
         uic.loadUi('win_connection_error.ui',self)
+        # Обслуживаемые виджеты
         self.cancel_button.clicked.connect(self.button_cancel)
 
     def button_cancel(self):
@@ -417,15 +449,17 @@ class Window_soapy(QDialog): #SoapySDR(USB)
         self.device = None
         self.win_parent = win_parent
         self.win_parent_obj = None
+        # Обслуживаемые виджеты
         self.cancel_button_usb.clicked.connect(self.button_cancel)
         self.update_button_usb.clicked.connect(self.pushButton_update_func)
         self.continue_button_usb.clicked.connect(self.pushButton_choose_func)
+        # Вызываемые окна
         self.window_error = Window_connection_error(win_parent)
 
     def pushButton_update_func(self):
         self.listWidget_usb.clear()
         for d in SoapySDR.Device.enumerate(''):
-            self.listWidget_usb.addItem(str(d['label'] ))
+            self.listWidget_usb.addItem(str(d['label']))
 
     def ident_parent(self):
         if self.win_parent == 'server':
@@ -503,33 +537,43 @@ class Window_demod(QWidget):
     def __init__(self):
         super().__init__()
         uic.loadUi('win_demodulation.ui', self)
-        # self.pushButton_cancel.clicked.connect(lambda: self.close())
-        if (fmfm_wav_iq.REMOUTE == False):
-            print("print")
-            #self.device = SDRDevice('sdrplay')
-            #for i in self.device.sample_rates:
-            #    self.comboBox_sampl.addItem(str(i))
-            #self.comboBox_sampl.setCurrentIndex(0)
+        self.DEMOD = None
+        # Обслуживаемые виджеты
         self.cancel_button_demod.clicked.connect(self.button_cancel)
         self.continue_button_demod.clicked.connect(self.start_DSP)
-        #self.checkBox.stateChanged.connect(self.onStateChanged)
+        self.checkBox.stateChanged.connect(self.onStateChanged)
         
     def start_DSP(self):
-        fmfm_wav_iq.BASE_FREQ = self.doubleSpinBox_freq.value() * 1000000
-        print(fmfm_wav_iq.BASE_FREQ)
-        sampl_currentText = self.comboBox_sampl.currentText()
-        sampl_audio_currentText = mainwindow.window_client.comboBox_output_samp_freq_2.currentText()
-        print(sampl_currentText)
-        dot_index = sampl_currentText.find('.')
-        print(dot_index)
-        if dot_index > -1:
-            sampl_currentText = sampl_currentText[:dot_index]
-        fmfm_wav_iq.SAMP_RATE = int(sampl_currentText)
-        print(fmfm_wav_iq.SAMP_RATE)
-        fmfm_wav_iq.SAMP_RATE_2 = int(sampl_audio_currentText)
-        print(fmfm_wav_iq.SAMP_RATE_2)
-        self.hide()
-        fmfm_wav_iq.fmfm_start_dsp()
+        self.DEMOD = self.tabWidget.currentIndex()
+        if self.DEMOD == 0:
+            fmfm_wav_iq.BASE_FREQ = self.doubleSpinBox_freq.value() * 1000000
+            sampl_currentText = self.comboBox_sampl.currentText()
+            sampl_audio_currentText = mainwindow.window_client.comboBox_output_samp_freq_2.currentText()
+            print(sampl_currentText)
+            dot_index = sampl_currentText.find('.')
+            print(dot_index)
+            if dot_index > -1:
+                sampl_currentText = sampl_currentText[:dot_index]
+            fmfm_wav_iq.SAMP_RATE = int(sampl_currentText)
+            print(fmfm_wav_iq.SAMP_RATE)
+            fmfm_wav_iq.SAMP_RATE_2 = int(sampl_audio_currentText)
+            print(fmfm_wav_iq.SAMP_RATE_2)
+            self.hide()
+            fmfm_wav_iq.fmfm_start_dsp()
+        elif self.DEMOD == 3:
+            am_waw_iq.BASE_FREQ = self.doubleSpinBox_freq.value() * 1000000
+            sampl_currentText = self.comboBox_sampl.currentText()
+            sampl_audio_currentText = mainwindow.window_client.comboBox_output_samp_freq_2.currentText()
+            print(sampl_currentText)
+            dot_index = sampl_currentText.find('.')
+            print(dot_index)
+            if dot_index > -1:
+                sampl_currentText = sampl_currentText[:dot_index]
+            am_waw_iq.SAMP_RATE = int(sampl_currentText)
+            print(fmfm_wav_iq.SAMP_RATE)
+            am_waw_iq.SAMP_RATE_2 = int(sampl_audio_currentText)
+            self.hide()
+            am_waw_iq.fmfm_start_dsp()
 
     def button_cancel(self):
         self.close()
@@ -554,7 +598,7 @@ class SDRDevice():
 
     def get_text(self):
         text = "#######################################################\n"
-        text += "Driver Key:" +  str(self.device.getDriverKey()) + "\n"
+        text += "Driver Key:" + str(self.device.getDriverKey()) + "\n"
         text += "#######################################################\n"
         text += "Hardware Key: " + str(self.device.getHardwareKey()) + "\n"
         text += "#######################################################\n"
@@ -580,7 +624,7 @@ class SDRDevice():
         frequency_name = frequencies[0]
         text += "Frequency channel name:" + str(frequency_name) + "\n"
 
-        text += "Frequency range:" +str( self.device.getFrequencyRange(SoapySDR.SOAPY_SDR_RX, ch, frequency_name)[0])
+        text += "Frequency range:" +str(self.device.getFrequencyRange(SoapySDR.SOAPY_SDR_RX, ch, frequency_name)[0])
         return text
 
     def print_info(self):
@@ -588,27 +632,6 @@ class SDRDevice():
         ch = channels[0]
         self.sample_rates = self.device.listSampleRates(SoapySDR.SOAPY_SDR_RX, ch)
         self.bandwidths = list(map(lambda r: int(r.maximum()), self.device.getBandwidthRange(SoapySDR.SOAPY_SDR_RX, ch)))
-
-
-
-
-class MainWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        uic.loadUi('win_start.ui', self)
-        self.pushButton_server.clicked.connect(self.openWindow_server)
-        self.pushButton_client.clicked.connect(self.openWindow_client)
-        # 1 вызываемое окно
-        self.window_server = Window_server()
-        # 2 вызываемое окно
-        self.window_client = Window_client()
-
-    def openWindow_server(self, checked):
-        self.hide()
-        self.window_server.show()
-    def openWindow_client(self, checked):
-        self.hide()
-        self.window_client.show()
 
 app = QApplication(sys.argv)
 mainwindow = MainWindow()
