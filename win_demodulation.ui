@@ -267,7 +267,7 @@ selection-background-color: lightgreen;
                </font>
               </property>
               <property name="text">
-               <string>Гц</string>
+               <string>кГц</string>
               </property>
              </widget>
             </item>
@@ -341,7 +341,7 @@ selection-background-color: lightgreen;
                <bool>true</bool>
               </property>
               <property name="maximum">
-               <double>999.990000000000009</double>
+               <double>999999.990000000000009</double>
               </property>
              </widget>
             </item>
@@ -473,7 +473,7 @@ selection-background-color: lightgreen;
                </font>
               </property>
               <property name="text">
-               <string>Гц</string>
+               <string>кГц</string>
               </property>
              </widget>
             </item>
@@ -547,7 +547,7 @@ selection-background-color: lightgreen;
                <bool>true</bool>
               </property>
               <property name="maximum">
-               <double>999.990000000000009</double>
+               <double>999999.990000000000009</double>
               </property>
              </widget>
             </item>

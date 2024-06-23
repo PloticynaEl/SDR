@@ -541,7 +541,7 @@ class Window_demod(QWidget):
         # Обслуживаемые виджеты
         self.cancel_button_demod.clicked.connect(self.button_cancel)
         self.continue_button_demod.clicked.connect(self.start_DSP)
-        self.checkBox.stateChanged.connect(self.onStateChanged)
+#        self.checkBox.stateChanged.connect(self.onStateChanged)
         
     def start_DSP(self):
         self.DEMOD = self.tabWidget.currentIndex()
